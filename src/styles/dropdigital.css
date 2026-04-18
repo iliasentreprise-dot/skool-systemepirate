@@ -185,3 +185,23 @@
   transition: background 0.15s;
 }
 .dd-root .lightbox-close:hover { background: #2a1a4a; }
+.dd-root .lightbox-content { position: relative; }
+.dd-root .lightbox-watch {
+  position: absolute; bottom: 16px; right: 16px;
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 8px 18px 8px 8px; border-radius: 999px;
+  background: rgba(15, 8, 32, 0.85); color: #fff;
+  border: 1px solid rgba(168, 85, 247, 0.5);
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: transform 0.15s, background 0.15s, border-color 0.15s;
+  z-index: 2;
+}
+.dd-root .lightbox-watch:hover { background: rgba(124, 58, 237, 0.25); border-color: #a855f7; transform: translateY(-1px); }
+.dd-root .lightbox-watch-play {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
+  display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.5);
+}
+.dd-root .lightbox-watch-play svg { width: 14px; height: 14px; margin-left: 2px; }
