@@ -139,6 +139,25 @@ const modules = [
 ];
 
 function ModulesTab() {
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (lightboxIdx === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxIdx(null);
+      else if (e.key === "ArrowRight") setLightboxIdx((i) => (i === null ? i : (i + 1) % modules.length));
+      else if (e.key === "ArrowLeft") setLightboxIdx((i) => (i === null ? i : (i - 1 + modules.length) % modules.length));
+    };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [lightboxIdx]);
+
+  const current = lightboxIdx !== null ? modules[lightboxIdx] : null;
+
   return (
     <div className="tab-content active">
       <div className="section-header">
@@ -153,9 +172,13 @@ function ModulesTab() {
         <span className="pg-pct">48%</span>
       </div>
       <div className="modules-grid">
-        {modules.map((m) => (
+        {modules.map((m, idx) => (
           <div className="module-card" key={m.num}>
-            <div className="module-thumb">
+            <div
+              className="module-thumb"
+              onClick={() => setLightboxIdx(idx)}
+              style={{ cursor: "zoom-in" }}
+            >
               <img
                 src={m.img}
                 alt={m.title}
@@ -190,6 +213,45 @@ function ModulesTab() {
         </div>
         <button className="cta-btn">Réserver mon accès →</button>
       </div>
+
+      {current && lightboxIdx !== null && (
+        <div className="lightbox-overlay" onClick={() => setLightboxIdx(null)}>
+          <button
+            className="lightbox-nav lightbox-prev"
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightboxIdx((i) => (i === null ? i : (i - 1 + modules.length) % modules.length));
+            }}
+            aria-label="Précédent"
+          >
+            ‹
+          </button>
+          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <img src={current.img} alt={current.title} className="lightbox-img" />
+            <div className="lightbox-caption">
+              <div className="lightbox-num">{current.num}</div>
+              <div className="lightbox-title">{current.title}</div>
+            </div>
+          </div>
+          <button
+            className="lightbox-nav lightbox-next"
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightboxIdx((i) => (i === null ? i : (i + 1) % modules.length));
+            }}
+            aria-label="Suivant"
+          >
+            ›
+          </button>
+          <button
+            className="lightbox-close"
+            onClick={() => setLightboxIdx(null)}
+            aria-label="Fermer"
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   );
 }
