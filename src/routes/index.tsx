@@ -110,7 +110,7 @@ function TabBtn({
   );
 }
 
-function Sidebar({ tab, setTab }: { tab: TabKey; setTab: (t: TabKey) => void }) {
+function Sidebar({ tab, setTab, open }: { tab: TabKey; setTab: (t: TabKey) => void; open: boolean }) {
   const item = (key: TabKey, icon: string, label: string, prog?: string) => (
     <div
       className={`sidebar-item ${tab === key ? "active" : ""}`}
@@ -121,7 +121,7 @@ function Sidebar({ tab, setTab }: { tab: TabKey; setTab: (t: TabKey) => void }) 
     </div>
   );
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${open ? "" : "closed"}`}>
       <div className="sidebar-title">Ma Formation</div>
       {item("modules", "📚", "Modules", "6")}
       {item("groupe", "🏴", "Groupe Privé")}
