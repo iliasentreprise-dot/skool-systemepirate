@@ -310,7 +310,7 @@ const posts = [
     n: "Mohamed E.",
     t: "il y a 3h",
     body:
-      "1 200€ ce mois-ci avec un ebook sur la dépression. Je suis entré dans la formation il y a 6 semaines. Continuez les pirates, ça marche 🏴",
+      "1 200€ ce mois-ci avec un outil qui génère de faux abonnés tiktok. Je suis entré dans la formation il y a 6 semaines. Continuez les pirates, ça marche 🏴",
     r: ["🔥 3"],
   },
 ];
