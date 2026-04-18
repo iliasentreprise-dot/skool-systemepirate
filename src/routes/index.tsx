@@ -8,6 +8,7 @@ import module3 from "@/assets/module-3.png";
 import module4 from "@/assets/module-4.png";
 import module5 from "@/assets/module-5.png";
 import module6 from "@/assets/module-6.png";
+import module7 from "@/assets/module-7.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -136,6 +137,7 @@ const modules = [
   { num: "Module 4", title: "Le Tunnel de vente Pirate", pct: 61, img: module4 },
   { num: "Module 5", title: "Stratégie Carrousels PIRATE", pct: 15, img: module5 },
   { num: "Module 6 — 🔒 SECRET", title: "L'OUTIL d'automatisation TikTok SECRET", pct: 0, img: module6 },
+  { num: "Module 7", title: "Les Lives TikTok", pct: 0, img: module7 },
 ];
 
 function ModulesTab() {
