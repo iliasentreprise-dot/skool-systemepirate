@@ -136,8 +136,8 @@ const modules = [
   { num: "Module 3", title: "Créer ton produit digital", pct: 37, img: module3 },
   { num: "Module 4", title: "Le Tunnel de vente Pirate", pct: 61, img: module4 },
   { num: "Module 5", title: "Stratégie Carrousels PIRATE", pct: 15, img: module5 },
-  { num: "Module 6 — 🔒 SECRET", title: "L'OUTIL d'automatisation TikTok SECRET", pct: 0, img: module6 },
-  { num: "Module 7", title: "Les Lives TikTok", pct: 0, img: module7 },
+  { num: "Module 6", title: "Les Lives TikTok", pct: 0, img: module7 },
+  { num: "Module 7 — 🔒 SECRET", title: "L'OUTIL d'automatisation TikTok SECRET", pct: 0, img: module6 },
 ];
 
 function ModulesTab() {
