@@ -23,7 +23,14 @@
 
 .dd-root .layout { display: flex; flex: 1; }
 
-.dd-root .sidebar { width: 240px; min-width: 240px; background: #0d0918; border-right: 1px solid #1e1035; padding: 20px 0; display: flex; flex-direction: column; gap: 2px; }
+.dd-root .menu-toggle { background: transparent; border: 1px solid #2a1a4a; color: #c4a0e8; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-right: 8px; transition: all 0.15s; padding: 0; }
+.dd-root .menu-toggle:hover { background: #1a0d30; border-color: #7c3aed; color: #fff; }
+.dd-root .menu-toggle svg { width: 18px; height: 18px; }
+
+.dd-root .sidebar { width: 240px; min-width: 240px; background: #0d0918; border-right: 1px solid #1e1035; padding: 20px 0; display: flex; flex-direction: column; gap: 2px; overflow: hidden; transition: width 0.3s ease, min-width 0.3s ease, border-color 0.3s ease; }
+.dd-root .sidebar.closed { width: 0; min-width: 0; border-right-color: transparent; }
+.dd-root .sidebar.closed > * { opacity: 0; pointer-events: none; }
+.dd-root .sidebar > * { transition: opacity 0.2s ease; white-space: nowrap; }
 .dd-root .sidebar-title { font-size: 11px; font-weight: 700; color: #6b4fa0; text-transform: uppercase; letter-spacing: 1.5px; padding: 0 20px 8px; }
 .dd-root .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; cursor: pointer; font-size: 13px; color: #b8a0d8; border-left: 3px solid transparent; transition: all 0.15s; }
 .dd-root .sidebar-item:hover { background: #180d2e; color: #d8b8ff; }

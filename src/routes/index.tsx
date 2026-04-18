@@ -34,11 +34,23 @@ type TabKey = "modules" | "groupe" | "coaching" | "resultats";
 
 function DropDigitalPage() {
   const [tab, setTab] = useState<TabKey>("modules");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
     <div className="dd-root">
       <div className="topbar">
         <div className="logo-wrap">
+          <button
+            className="menu-toggle"
+            onClick={() => setSidebarOpen((v) => !v)}
+            aria-label={sidebarOpen ? "Fermer le menu" : "Ouvrir le menu"}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="4" y1="6" x2="20" y2="6" />
+              <line x1="4" y1="12" x2="20" y2="12" />
+              <line x1="4" y1="18" x2="20" y2="18" />
+            </svg>
+          </button>
           <div className="logo-icon" aria-hidden="true">
             <img src={logo} alt="DropDigital" />
           </div>
@@ -57,7 +69,7 @@ function DropDigitalPage() {
       </div>
 
       <div className="layout">
-        <Sidebar tab={tab} setTab={setTab} />
+        <Sidebar tab={tab} setTab={setTab} open={sidebarOpen} />
 
         <div className="main">
           <div className="tabs-bar">
@@ -98,7 +110,7 @@ function TabBtn({
   );
 }
 
-function Sidebar({ tab, setTab }: { tab: TabKey; setTab: (t: TabKey) => void }) {
+function Sidebar({ tab, setTab, open }: { tab: TabKey; setTab: (t: TabKey) => void; open: boolean }) {
   const item = (key: TabKey, icon: string, label: string, prog?: string) => (
     <div
       className={`sidebar-item ${tab === key ? "active" : ""}`}
@@ -109,7 +121,7 @@ function Sidebar({ tab, setTab }: { tab: TabKey; setTab: (t: TabKey) => void }) 
     </div>
   );
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${open ? "" : "closed"}`}>
       <div className="sidebar-title">Ma Formation</div>
       {item("modules", "📚", "Modules", "6")}
       {item("groupe", "🏴", "Groupe Privé")}
