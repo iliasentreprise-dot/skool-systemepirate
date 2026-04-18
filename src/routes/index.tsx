@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../styles/dropdigital.css";
+import logo from "@/assets/logo.png";
 import module1 from "@/assets/module-1.png";
 import module2 from "@/assets/module-2.png";
 import module3 from "@/assets/module-3.png";
@@ -38,21 +39,7 @@ function DropDigitalPage() {
       <div className="topbar">
         <div className="logo-wrap">
           <div className="logo-icon" aria-hidden="true">
-            <div
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 8,
-                background: "linear-gradient(135deg,#7c3aed,#a855f7)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: 900,
-                color: "#fff",
-              }}
-            >
-              D
-            </div>
+            <img src={logo} alt="DropDigital" />
           </div>
           <div className="logo-text">
             Drop<span>Digital</span>
@@ -152,6 +139,25 @@ const modules = [
 ];
 
 function ModulesTab() {
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (lightboxIdx === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxIdx(null);
+      else if (e.key === "ArrowRight") setLightboxIdx((i) => (i === null ? i : (i + 1) % modules.length));
+      else if (e.key === "ArrowLeft") setLightboxIdx((i) => (i === null ? i : (i - 1 + modules.length) % modules.length));
+    };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [lightboxIdx]);
+
+  const current = lightboxIdx !== null ? modules[lightboxIdx] : null;
+
   return (
     <div className="tab-content active">
       <div className="section-header">
@@ -166,9 +172,13 @@ function ModulesTab() {
         <span className="pg-pct">48%</span>
       </div>
       <div className="modules-grid">
-        {modules.map((m) => (
+        {modules.map((m, idx) => (
           <div className="module-card" key={m.num}>
-            <div className="module-thumb">
+            <div
+              className="module-thumb"
+              onClick={() => setLightboxIdx(idx)}
+              style={{ cursor: "zoom-in" }}
+            >
               <img
                 src={m.img}
                 alt={m.title}
@@ -203,6 +213,45 @@ function ModulesTab() {
         </div>
         <button className="cta-btn">Réserver mon accès →</button>
       </div>
+
+      {current && lightboxIdx !== null && (
+        <div className="lightbox-overlay" onClick={() => setLightboxIdx(null)}>
+          <button
+            className="lightbox-nav lightbox-prev"
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightboxIdx((i) => (i === null ? i : (i - 1 + modules.length) % modules.length));
+            }}
+            aria-label="Précédent"
+          >
+            ‹
+          </button>
+          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <img src={current.img} alt={current.title} className="lightbox-img" />
+            <div className="lightbox-caption">
+              <div className="lightbox-num">{current.num}</div>
+              <div className="lightbox-title">{current.title}</div>
+            </div>
+          </div>
+          <button
+            className="lightbox-nav lightbox-next"
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightboxIdx((i) => (i === null ? i : (i + 1) % modules.length));
+            }}
+            aria-label="Suivant"
+          >
+            ›
+          </button>
+          <button
+            className="lightbox-close"
+            onClick={() => setLightboxIdx(null)}
+            aria-label="Fermer"
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   );
 }
