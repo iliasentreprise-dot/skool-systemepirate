@@ -246,6 +246,14 @@ function ModulesTab() {
               <div className="lightbox-num">{current.num}</div>
               <div className="lightbox-title">{current.title}</div>
             </div>
+            <button className="lightbox-watch" onClick={(e) => e.stopPropagation()}>
+              <span className="lightbox-watch-play" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </span>
+              Regarder
+            </button>
           </div>
           <button
             className="lightbox-nav lightbox-next"
@@ -293,16 +301,16 @@ const posts = [
     n: "Sarah L.",
     t: "il y a 1h",
     body:
-      "Question : vous trouvez vos visuels où ? J'utilise Canva mais je galère sur les templates pirates spécifiques.",
+      "Question : vous trouvez vos visuels où ? J'utilise Canva ou je génère tout avec l'outil de la formation à la place ?",
     r: ["🔥 1"],
   },
   {
-    i: "JR",
+    i: "ME",
     c: "#be185d",
-    n: "Jules R.",
+    n: "Mohamed E.",
     t: "il y a 3h",
     body:
-      "1 200€ ce mois-ci avec mon ebook bien-être. Je suis entré dans la formation il y a 6 semaines. Continuez les pirates, ça marche 🏴",
+      "1 200€ ce mois-ci avec un ebook sur la dépression. Je suis entré dans la formation il y a 6 semaines. Continuez les pirates, ça marche 🏴",
     r: ["🔥 3"],
   },
 ];
