@@ -283,9 +283,9 @@ const posts = [
     c: "#7c3aed",
     n: "Thomas M.",
     t: "il y a 12 min",
-    body:
+      body:
       "Première vente ce matin grâce au carrousel pirate ! 47€ en dormant 🔥 La méthode fonctionne vraiment, j'ai posté hier soir et ce matin la notif était là.",
-    r: ["🔥 24", "💜 18", "💬 7"],
+    r: [],
   },
   {
     i: "SL",
@@ -294,7 +294,7 @@ const posts = [
     t: "il y a 1h",
     body:
       "Question : vous trouvez vos visuels où ? J'utilise Canva mais je galère sur les templates pirates spécifiques.",
-    r: ["💜 12", "💬 9"],
+    r: ["🔥 1"],
   },
   {
     i: "JR",
@@ -303,7 +303,7 @@ const posts = [
     t: "il y a 3h",
     body:
       "1 200€ ce mois-ci avec mon ebook bien-être. Je suis entré dans la formation il y a 6 semaines. Continuez les pirates, ça marche 🏴",
-    r: ["🔥 61", "💜 47", "💬 23"],
+    r: ["🔥 3"],
   },
 ];
 
@@ -316,7 +316,7 @@ function GroupeTab() {
       </div>
       <div className="group-hero">
         <h2>Rejoins le Discord Officiel DropDigital</h2>
-        <p>+847 pirates actifs · Entraide quotidienne · Partage de résultats · Accès direct au formateur</p>
+        <p>+37 pirates actifs · Entraide quotidienne · Partage de résultats · Accès direct au formateur</p>
         <button className="discord-btn">🎮 Rejoindre le Discord</button>
       </div>
       <div
@@ -390,7 +390,7 @@ function GroupeTab() {
 
 const coachings = [
   {
-    tag: "🔴 LIVE MAINTENANT",
+    tag: "🔴 LIVE À 21H",
     tagClass: "tag-live",
     title: "Q&A Post-Formation — Tes questions en direct",
     date: "Aujourd'hui · 19h00 → 20h30",
@@ -472,9 +472,9 @@ function CoachingTab() {
 }
 
 const stats = [
-  { n: "847", l: "Pirates formés" },
-  { n: "312", l: "Premières ventes" },
-  { n: "89k€", l: "Générés ce mois" },
+  { n: "37", l: "Pirates formés" },
+  { n: "21", l: "Premières ventes" },
+  { n: "12k€", l: "Générés ce mois" },
   { n: "4.9⭐", l: "Note moyenne" },
 ];
 
