@@ -1,6 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import "../styles/dropdigital.css";
+import module1 from "@/assets/module-1.png";
+import module2 from "@/assets/module-2.png";
+import module3 from "@/assets/module-3.png";
+import module4 from "@/assets/module-4.png";
+import module5 from "@/assets/module-5.png";
+import module6 from "@/assets/module-6.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -137,12 +143,12 @@ function Sidebar({ tab, setTab }: { tab: TabKey; setTab: (t: TabKey) => void }) 
 }
 
 const modules = [
-  { num: "Module 1", title: "Présentation du système PIRATE", pct: 100 },
-  { num: "Module 2", title: "L'Offre Irrésistible", pct: 82 },
-  { num: "Module 3", title: "Créer ton produit digital", pct: 37 },
-  { num: "Module 4", title: "Le Tunnel de vente Pirate", pct: 61 },
-  { num: "Module 5", title: "Stratégie Carrousels PIRATE", pct: 15 },
-  { num: "Module 6 — 🔒 SECRET", title: "L'OUTIL d'automatisation TikTok SECRET", pct: 0 },
+  { num: "Module 1", title: "Présentation du système PIRATE", pct: 100, img: module1 },
+  { num: "Module 2", title: "L'Offre Irrésistible", pct: 82, img: module2 },
+  { num: "Module 3", title: "Créer ton produit digital", pct: 37, img: module3 },
+  { num: "Module 4", title: "Le Tunnel de vente Pirate", pct: 61, img: module4 },
+  { num: "Module 5", title: "Stratégie Carrousels PIRATE", pct: 15, img: module5 },
+  { num: "Module 6 — 🔒 SECRET", title: "L'OUTIL d'automatisation TikTok SECRET", pct: 0, img: module6 },
 ];
 
 function ModulesTab() {
@@ -163,13 +169,11 @@ function ModulesTab() {
         {modules.map((m) => (
           <div className="module-card" key={m.num}>
             <div className="module-thumb">
-              <div
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  background:
-                    "linear-gradient(135deg,#1a0d30 0%,#2a1a4a 50%,#3b0764 100%)",
-                }}
+              <img
+                src={m.img}
+                alt={m.title}
+                loading="lazy"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
               <div className="play-btn" />
             </div>
