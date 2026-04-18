@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../styles/dropdigital.css";
+import logo from "@/assets/logo.png";
 import module1 from "@/assets/module-1.png";
 import module2 from "@/assets/module-2.png";
 import module3 from "@/assets/module-3.png";
@@ -38,21 +39,7 @@ function DropDigitalPage() {
       <div className="topbar">
         <div className="logo-wrap">
           <div className="logo-icon" aria-hidden="true">
-            <div
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 8,
-                background: "linear-gradient(135deg,#7c3aed,#a855f7)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: 900,
-                color: "#fff",
-              }}
-            >
-              D
-            </div>
+            <img src={logo} alt="DropDigital" />
           </div>
           <div className="logo-text">
             Drop<span>Digital</span>
