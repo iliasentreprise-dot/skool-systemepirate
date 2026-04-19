@@ -1,5 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/lib/auth-context";
+import { supabase } from "@/integrations/supabase/client";
 import "../styles/dropdigital.css";
 import logo from "@/assets/logo.png";
 import module1 from "@/assets/module-1.png";
@@ -33,8 +35,22 @@ export const Route = createFileRoute("/")({
 type TabKey = "modules" | "groupe" | "coaching" | "resultats";
 
 function DropDigitalPage() {
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
   const [tab, setTab] = useState<TabKey>("modules");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    if (!loading && !user) navigate({ to: "/login" });
+  }, [user, loading, navigate]);
+
+  if (loading || !user) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#0e0418", color: "#c4a3f0", fontFamily: "-apple-system, sans-serif" }}>
+        Chargement...
+      </div>
+    );
+  }
 
   return (
     <div className="dd-root">
@@ -135,7 +151,7 @@ function Sidebar({ tab, setTab, open }: { tab: TabKey; setTab: (t: TabKey) => vo
       <div className="sidebar-item">
         <span>⚙</span> Paramètres
       </div>
-      <div className="sidebar-item">
+      <div className="sidebar-item" onClick={() => { void supabase.auth.signOut().then(() => window.location.assign("/login")); }} style={{ cursor: "pointer" }}>
         <span>🚪</span> Déconnexion
       </div>
     </div>
