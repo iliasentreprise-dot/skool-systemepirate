@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
+import { supabase } from "@/integrations/supabase/client";
 import "../styles/dropdigital.css";
 import logo from "@/assets/logo.png";
 import module1 from "@/assets/module-1.png";
