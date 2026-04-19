@@ -205,3 +205,40 @@
   color: #fff; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.5);
 }
 .dd-root .lightbox-watch-play svg { width: 14px; height: 14px; margin-left: 2px; }
+
+/* Composer */
+.dd-root .composer { background: #120822; border: 1px solid #1e1035; border-radius: 12px; padding: 14px; margin-bottom: 24px; }
+.dd-root .composer-input { width: 100%; background: #0a0612; border: 1px solid #2a1a4a; border-radius: 8px; color: #fff; padding: 10px 12px; font-family: inherit; font-size: 14px; resize: vertical; outline: none; transition: border-color 0.15s; }
+.dd-root .composer-input:focus { border-color: #7c3aed; }
+.dd-root .composer-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+.dd-root .composer-file { background: #1a0d30; border: 1px solid #2a1a4a; color: #c4a0e8; padding: 8px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; transition: all 0.15s; }
+.dd-root .composer-file:hover { border-color: #7c3aed; color: #fff; }
+.dd-root .composer-clear { background: transparent; border: 1px solid #2a1a4a; color: #b8a0d8; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; }
+.dd-root .composer-submit { margin-left: auto; background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; border: none; padding: 9px 18px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); transition: transform 0.1s; }
+.dd-root .composer-submit:hover:not(:disabled) { transform: translateY(-1px); }
+.dd-root .composer-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+.dd-root .composer-error { color: #fca5a5; font-size: 12px; margin-top: 8px; }
+
+/* Feed image */
+.dd-root .feed-image { width: 100%; max-height: 480px; object-fit: cover; border-radius: 10px; margin-top: 10px; border: 1px solid #1e1035; }
+.dd-root .reaction-btn { background: #1a0d30; border: 1px solid #2a1a4a; color: #c4a0e8; cursor: pointer; transition: all 0.15s; }
+.dd-root .reaction-btn:hover { border-color: #7c3aed; color: #fff; }
+
+/* Comments */
+.dd-root .comments { margin-top: 14px; padding-top: 14px; border-top: 1px solid #1e1035; display: flex; flex-direction: column; gap: 12px; }
+.dd-root .comment { display: flex; gap: 10px; }
+.dd-root .comment-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+.dd-root .comment-body { flex: 1; background: #0a0612; border: 1px solid #1e1035; border-radius: 10px; padding: 8px 12px; }
+.dd-root .comment-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.dd-root .comment-name { font-weight: 700; font-size: 13px; color: #fff; }
+.dd-root .comment-time { font-size: 11px; color: #6b4fa0; }
+.dd-root .comment-text { font-size: 13px; color: #d8c4f5; white-space: pre-wrap; }
+.dd-root .comment-image { display: block; margin-top: 8px; max-width: 100%; max-height: 320px; border-radius: 8px; border: 1px solid #1e1035; }
+.dd-root .comment-form { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
+.dd-root .comment-input { flex: 1; background: #0a0612; border: 1px solid #2a1a4a; color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 13px; outline: none; transition: border-color 0.15s; }
+.dd-root .comment-input:focus { border-color: #7c3aed; }
+.dd-root .comment-file { background: #1a0d30; border: 1px solid #2a1a4a; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.15s; }
+.dd-root .comment-file:hover { border-color: #7c3aed; }
+.dd-root .comment-submit { background: #7c3aed; color: #fff; border: none; padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.dd-root .comment-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+.dd-root .comment-file-name { font-size: 11px; color: #9a7dbd; margin-top: 4px; }
