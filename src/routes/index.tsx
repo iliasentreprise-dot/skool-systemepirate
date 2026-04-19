@@ -146,7 +146,7 @@ function Sidebar({ tab, setTab, open }: { tab: TabKey; setTab: (t: TabKey) => vo
       <div className="sidebar-divider" />
       <div className="sidebar-title">Compte</div>
       <div className="sidebar-item">
-        <span>📊</span> Progression <span className="si-prog">48%</span>
+        <span>📊</span> Progression <span className="si-prog">0%</span>
       </div>
       <div className="sidebar-item">
         <span>⚙</span> Paramètres
@@ -159,11 +159,11 @@ function Sidebar({ tab, setTab, open }: { tab: TabKey; setTab: (t: TabKey) => vo
 }
 
 const modules = [
-  { num: "Module 1", title: "Présentation du système PIRATE", pct: 100, img: module1 },
-  { num: "Module 2", title: "L'Offre Irrésistible", pct: 82, img: module2 },
-  { num: "Module 3", title: "Créer ton produit digital", pct: 37, img: module3 },
-  { num: "Module 4", title: "Le Tunnel de vente Pirate", pct: 61, img: module4 },
-  { num: "Module 5", title: "Stratégie Carrousels PIRATE", pct: 15, img: module5 },
+  { num: "Module 1", title: "Présentation du système PIRATE", pct: 0, img: module1 },
+  { num: "Module 2", title: "L'Offre Irrésistible", pct: 0, img: module2 },
+  { num: "Module 3", title: "Créer ton produit digital", pct: 0, img: module3 },
+  { num: "Module 4", title: "Le Tunnel de vente Pirate", pct: 0, img: module4 },
+  { num: "Module 5", title: "Stratégie Carrousels PIRATE", pct: 0, img: module5 },
   { num: "Module 6", title: "Les Lives TikTok", pct: 0, img: module7 },
   { num: "Module 7 — 🔒 SECRET", title: "L'OUTIL d'automatisation TikTok SECRET", pct: 0, img: module6 },
 ];
@@ -197,9 +197,9 @@ function ModulesTab() {
       <div className="progress-global">
         <span className="pg-label">Progression globale</span>
         <div className="pg-bar-wrap">
-          <div className="pg-bar" />
+          <div className="pg-bar" style={{ width: "0%" }} />
         </div>
-        <span className="pg-pct">48%</span>
+        <span className="pg-pct">0%</span>
       </div>
       <div className="modules-grid">
         {modules.map((m, idx) => (
