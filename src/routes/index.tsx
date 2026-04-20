@@ -19,13 +19,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Formation DropDigital — Vendre des produits digitaux sur TikTok, sans visage, sans audience, sans budget pub.",
+          "Formation DropDigital — Vendre des produits digitaux sur TikTok en automatique, sans visage, sans audience, sans montage.",
       },
       { property: "og:title", content: "DropDigital — Système Pirate" },
       {
         property: "og:description",
         content:
-          "Formation DropDigital — Vendre des produits digitaux sur TikTok, sans visage, sans audience, sans budget pub.",
+          "Formation DropDigital — Vendre des produits digitaux sur TikTok en automatique, sans visage, sans audience, sans montage.",
       },
     ],
   }),
@@ -192,7 +192,7 @@ function ModulesTab() {
     <div className="tab-content active">
       <div className="section-header">
         <h1>🏴 Système Pirate — Ma Formation</h1>
-        <p>Vendre des produits digitaux sur TikTok · Sans visage · Sans audience · Sans budget pub</p>
+        <p>Vendre des produits digitaux sur TikTok en automatique · Sans visage · Sans audience · Sans montage</p>
       </div>
       <div className="progress-global">
         <span className="pg-label">Progression globale</span>
@@ -544,7 +544,7 @@ function GroupeTab() {
           marginBottom: 14,
         }}
       >
-        Membres en ligne ({online.length})
+        Membres en ligne ({Math.max(online.length, user ? 1 : 0)})
       </div>
       <div className="members-grid">
         {online.length === 0 && user && (
