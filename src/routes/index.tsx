@@ -32,17 +32,25 @@ export const Route = createFileRoute("/")({
   component: DropDigitalPage,
 });
 
-type TabKey = "modules" | "groupe" | "coaching" | "resultats";
+type TabKey = "modules" | "groupe" | "coaching" | "resultats" | "profil" | "parametres";
 
 function DropDigitalPage() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const [tab, setTab] = useState<TabKey>("modules");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    if (typeof window === "undefined") return "dark";
+    return (localStorage.getItem("dd-theme") as "dark" | "light") || "dark";
+  });
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
   }, [user, loading, navigate]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") localStorage.setItem("dd-theme", theme);
+  }, [theme]);
 
   if (loading || !user) {
     return (
@@ -53,7 +61,7 @@ function DropDigitalPage() {
   }
 
   return (
-    <div className="dd-root">
+    <div className={`dd-root ${theme === "light" ? "dd-light" : ""}`}>
       <div className="topbar">
         <div className="logo-wrap">
           <button
