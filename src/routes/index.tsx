@@ -781,7 +781,15 @@ function CommentSection({
                 <span className="comment-time">{timeAgo(c.created_at)}</span>
               </div>
               <div className="comment-text">{c.body}</div>
-              {c.image_url && <img src={c.image_url} alt="" className="comment-image" loading="lazy" />}
+              {c.image_url && (
+                <img
+                  src={c.image_url}
+                  alt=""
+                  className="comment-image"
+                  loading="lazy"
+                  onClick={() => onImageClick(c.image_url!)}
+                />
+              )}
             </div>
           </div>
         );
