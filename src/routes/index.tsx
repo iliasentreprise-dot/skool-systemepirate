@@ -19,13 +19,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Formation DropDigital — Vendre des produits digitaux sur TikTok, sans visage, sans audience, sans budget pub.",
+          "Formation DropDigital — Vendre des produits digitaux sur TikTok en automatique, sans visage, sans audience, sans montage.",
       },
       { property: "og:title", content: "DropDigital — Système Pirate" },
       {
         property: "og:description",
         content:
-          "Formation DropDigital — Vendre des produits digitaux sur TikTok, sans visage, sans audience, sans budget pub.",
+          "Formation DropDigital — Vendre des produits digitaux sur TikTok en automatique, sans visage, sans audience, sans montage.",
       },
     ],
   }),
@@ -192,7 +192,7 @@ function ModulesTab() {
     <div className="tab-content active">
       <div className="section-header">
         <h1>🏴 Système Pirate — Ma Formation</h1>
-        <p>Vendre des produits digitaux sur TikTok · Sans visage · Sans audience · Sans budget pub</p>
+        <p>Vendre des produits digitaux sur TikTok en automatique · Sans visage · Sans audience · Sans montage</p>
       </div>
       <div className="progress-global">
         <span className="pg-label">Progression globale</span>
@@ -360,6 +360,7 @@ function GroupeTab() {
   const [postFile, setPostFile] = useState<File | null>(null);
   const [posting, setPosting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lightbox, setLightbox] = useState<string | null>(null);
 
   // Load profile (for presence + author display)
   useEffect(() => {
@@ -544,7 +545,7 @@ function GroupeTab() {
           marginBottom: 14,
         }}
       >
-        Membres en ligne ({online.length})
+        Membres en ligne ({Math.max(online.length, user ? 1 : 0)})
       </div>
       <div className="members-grid">
         {online.length === 0 && user && (
@@ -652,7 +653,14 @@ function GroupeTab() {
             </div>
             <div className="feed-body">{p.body}</div>
             {p.image_url && (
-              <img src={p.image_url} alt="" className="feed-image" loading="lazy" />
+              <img
+                src={p.image_url}
+                alt=""
+                className="feed-image"
+                loading="lazy"
+                onClick={() => setLightbox(p.image_url!)}
+                style={{ cursor: "zoom-in" }}
+              />
             )}
             <div className="feed-reactions">
               <button className="reaction reaction-btn" onClick={() => toggleComments(p.id)}>
@@ -665,11 +673,42 @@ function GroupeTab() {
                 items={comments[p.id] || []}
                 onPosted={() => loadComments(p.id)}
                 uploadImage={uploadImage}
+                onImageClick={(url) => setLightbox(url)}
               />
             )}
           </div>
         );
       })}
+      {lightbox && (
+        <div
+          onClick={() => setLightbox(null)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(5, 1, 14, 0.75)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+            cursor: "zoom-out",
+            padding: 24,
+          }}
+        >
+          <img
+            src={lightbox}
+            alt=""
+            style={{
+              maxWidth: "92vw",
+              maxHeight: "92vh",
+              borderRadius: 12,
+              boxShadow: "0 20px 60px -10px rgba(168,85,247,0.5)",
+              border: "1px solid rgba(168,85,247,0.4)",
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -679,11 +718,13 @@ function CommentSection({
   items,
   onPosted,
   uploadImage,
+  onImageClick,
 }: {
   postId: string;
   items: CommentRow[];
   onPosted: () => void;
   uploadImage: (f: File) => Promise<string | null>;
+  onImageClick: (url: string) => void;
 }) {
   const { user } = useAuth();
   const [body, setBody] = useState("");
@@ -740,7 +781,15 @@ function CommentSection({
                 <span className="comment-time">{timeAgo(c.created_at)}</span>
               </div>
               <div className="comment-text">{c.body}</div>
-              {c.image_url && <img src={c.image_url} alt="" className="comment-image" loading="lazy" />}
+              {c.image_url && (
+                <img
+                  src={c.image_url}
+                  alt=""
+                  className="comment-image"
+                  loading="lazy"
+                  onClick={() => onImageClick(c.image_url!)}
+                />
+              )}
             </div>
           </div>
         );
