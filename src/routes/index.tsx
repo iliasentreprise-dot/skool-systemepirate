@@ -360,6 +360,7 @@ function GroupeTab() {
   const [postFile, setPostFile] = useState<File | null>(null);
   const [posting, setPosting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lightbox, setLightbox] = useState<string | null>(null);
 
   // Load profile (for presence + author display)
   useEffect(() => {
@@ -652,7 +653,14 @@ function GroupeTab() {
             </div>
             <div className="feed-body">{p.body}</div>
             {p.image_url && (
-              <img src={p.image_url} alt="" className="feed-image" loading="lazy" />
+              <img
+                src={p.image_url}
+                alt=""
+                className="feed-image"
+                loading="lazy"
+                onClick={() => setLightbox(p.image_url!)}
+                style={{ cursor: "zoom-in" }}
+              />
             )}
             <div className="feed-reactions">
               <button className="reaction reaction-btn" onClick={() => toggleComments(p.id)}>
@@ -665,6 +673,7 @@ function GroupeTab() {
                 items={comments[p.id] || []}
                 onPosted={() => loadComments(p.id)}
                 uploadImage={uploadImage}
+                onImageClick={(url) => setLightbox(url)}
               />
             )}
           </div>
