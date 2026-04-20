@@ -32,17 +32,25 @@ export const Route = createFileRoute("/")({
   component: DropDigitalPage,
 });
 
-type TabKey = "modules" | "groupe" | "coaching" | "resultats";
+type TabKey = "modules" | "groupe" | "coaching" | "resultats" | "profil" | "parametres";
 
 function DropDigitalPage() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const [tab, setTab] = useState<TabKey>("modules");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    if (typeof window === "undefined") return "dark";
+    return (localStorage.getItem("dd-theme") as "dark" | "light") || "dark";
+  });
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
   }, [user, loading, navigate]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") localStorage.setItem("dd-theme", theme);
+  }, [theme]);
 
   if (loading || !user) {
     return (
@@ -53,7 +61,7 @@ function DropDigitalPage() {
   }
 
   return (
-    <div className="dd-root">
+    <div className={`dd-root ${theme === "light" ? "dd-light" : ""}`}>
       <div className="topbar">
         <div className="logo-wrap">
           <button
@@ -99,6 +107,8 @@ function DropDigitalPage() {
           {tab === "groupe" && <GroupeTab />}
           {tab === "coaching" && <CoachingTab />}
           {tab === "resultats" && <ResultatsTab />}
+          {tab === "profil" && <ProfilTab />}
+          {tab === "parametres" && <ParametresTab theme={theme} setTheme={setTheme} />}
         </div>
       </div>
     </div>
@@ -145,11 +155,28 @@ function Sidebar({ tab, setTab, open }: { tab: TabKey; setTab: (t: TabKey) => vo
       {item("resultats", "🏆", "Résultats Élèves")}
       <div className="sidebar-divider" />
       <div className="sidebar-title">Compte</div>
+      <div
+        className={`sidebar-item ${tab === "profil" ? "active" : ""}`}
+        onClick={() => setTab("profil")}
+        style={{ cursor: "pointer" }}
+      >
+        <span>👤</span> Profil
+      </div>
       <div className="sidebar-item">
         <span>📊</span> Progression <span className="si-prog">0%</span>
       </div>
-      <div className="sidebar-item">
-        <span>⚙</span> Paramètres
+      <div
+        className={`sidebar-item ${tab === "parametres" ? "active" : ""}`}
+        onClick={() => setTab("parametres")}
+        style={{ cursor: "pointer" }}
+      >
+        <span className="gear-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+        </span>
+        Paramètres
       </div>
       <div className="sidebar-item" onClick={() => { void supabase.auth.signOut().then(() => window.location.assign("/login")); }} style={{ cursor: "pointer" }}>
         <span>🚪</span> Déconnexion
@@ -986,6 +1013,410 @@ function ResultatsTab() {
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// Profil Tab
+// ============================================================================
+type ProfileData = {
+  id: string;
+  username: string | null;
+  full_name: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  show_progression: boolean;
+  username_changed: boolean;
+};
+
+function ProfilTab() {
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  const [bio, setBio] = useState("");
+  const [showProg, setShowProg] = useState(true);
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, username, full_name, avatar_url, bio, show_progression, username_changed")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (data) {
+        setProfile(data as ProfileData);
+        setBio(data.bio || "");
+        setShowProg(data.show_progression ?? true);
+      }
+      setLoading(false);
+    })();
+  }, [user]);
+
+  const onAvatarChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    if (file.size > 3 * 1024 * 1024) {
+      setErr("Image trop lourde (max 3 Mo).");
+      return;
+    }
+    setUploading(true);
+    setErr(null);
+    const ext = file.name.split(".").pop() || "jpg";
+    const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+    if (upErr) {
+      setErr(upErr.message);
+      setUploading(false);
+      return;
+    }
+    const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+    const url = data.publicUrl;
+    const { error: updErr } = await supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id);
+    if (updErr) setErr(updErr.message);
+    else {
+      setProfile((p) => (p ? { ...p, avatar_url: url } : p));
+      setMsg("Photo de profil mise à jour ✓");
+      setTimeout(() => setMsg(null), 2500);
+    }
+    setUploading(false);
+  };
+
+  const saveProfile = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!user || !profile) return;
+    setSaving(true);
+    setErr(null);
+    setMsg(null);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ bio: bio.slice(0, 500), show_progression: showProg })
+      .eq("id", user.id);
+    if (error) setErr(error.message);
+    else {
+      setMsg("Profil sauvegardé ✓");
+      setTimeout(() => setMsg(null), 2500);
+    }
+    setSaving(false);
+  };
+
+  if (loading) {
+    return <div className="tab-content active"><div style={{ color: "#9a7dbd" }}>Chargement…</div></div>;
+  }
+
+  const name = displayName(profile, user?.email?.split("@")[0] || "Pirate");
+
+  return (
+    <div className="tab-content active">
+      <div className="section-header">
+        <h1>👤 Mon Profil</h1>
+        <p>Gère ta photo, ta bio et la visibilité de ta progression</p>
+      </div>
+
+      <div className="profile-card">
+        <div className="profile-avatar-wrap">
+          {profile?.avatar_url ? (
+            <img src={profile.avatar_url} alt="Avatar" className="profile-avatar-img" />
+          ) : (
+            <div className="profile-avatar-fallback" style={{ background: colorFromId(user!.id) }}>
+              {initialsFromName(name)}
+            </div>
+          )}
+          <label className="profile-avatar-edit">
+            {uploading ? "…" : "📷 Changer"}
+            <input type="file" accept="image/*" hidden onChange={onAvatarChange} disabled={uploading} />
+          </label>
+        </div>
+        <div className="profile-info">
+          <div className="profile-name">{name}</div>
+          <div className="profile-email">{user?.email}</div>
+        </div>
+      </div>
+
+      <form className="profile-form" onSubmit={saveProfile}>
+        <label className="profile-label">
+          Bio
+          <textarea
+            className="profile-textarea"
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            maxLength={500}
+            rows={4}
+            placeholder="Parle un peu de toi, ton business, tes objectifs…"
+          />
+          <span className="profile-counter">{bio.length}/500</span>
+        </label>
+
+        <label className="profile-toggle">
+          <span>
+            <strong>Afficher ma progression</strong>
+            <span className="profile-hint">Si activé, les autres pirates peuvent voir ta progression dans la formation</span>
+          </span>
+          <input type="checkbox" checked={showProg} onChange={(e) => setShowProg(e.target.checked)} />
+        </label>
+
+        {showProg && (
+          <div className="profile-progression">
+            <div className="pg-label">Ma progression globale</div>
+            <div className="pg-bar-wrap" style={{ marginTop: 8 }}>
+              <div className="pg-bar" style={{ width: "0%" }} />
+            </div>
+            <div style={{ marginTop: 8, fontSize: 13, color: "#9a7dbd" }}>0% — Continue, pirate ! 🏴‍☠️</div>
+          </div>
+        )}
+
+        <div className="profile-actions">
+          <button type="submit" className="profile-save" disabled={saving}>
+            {saving ? "Sauvegarde…" : "Sauvegarder"}
+          </button>
+          {msg && <span className="profile-msg">{msg}</span>}
+          {err && <span className="profile-err">{err}</span>}
+        </div>
+      </form>
+    </div>
+  );
+}
+
+// ============================================================================
+// Paramètres Tab
+// ============================================================================
+function ParametresTab({ theme, setTheme }: { theme: "dark" | "light"; setTheme: (t: "dark" | "light") => void }) {
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [username, setUsername] = useState("");
+  const [savingName, setSavingName] = useState(false);
+  const [nameMsg, setNameMsg] = useState<string | null>(null);
+  const [nameErr, setNameErr] = useState<string | null>(null);
+
+  type Notifs = { live: boolean; posts: boolean; replies: boolean; dm: boolean };
+  const [notifs, setNotifs] = useState<Notifs>(() => {
+    if (typeof window === "undefined") return { live: true, posts: true, replies: true, dm: true };
+    try {
+      return JSON.parse(localStorage.getItem("dd-notifs") || '{"live":true,"posts":true,"replies":true,"dm":true}') as Notifs;
+    } catch {
+      return { live: true, posts: true, replies: true, dm: true };
+    }
+  });
+  useEffect(() => {
+    localStorage.setItem("dd-notifs", JSON.stringify(notifs));
+  }, [notifs]);
+
+  const [newEmail, setNewEmail] = useState("");
+  const [emailMsg, setEmailMsg] = useState<string | null>(null);
+  const [newPass, setNewPass] = useState("");
+  const [passMsg, setPassMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, username, full_name, avatar_url, bio, show_progression, username_changed")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (data) {
+        setProfile(data as ProfileData);
+        setUsername(data.username || "");
+      }
+    })();
+  }, [user]);
+
+  const saveUsername = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!user || !profile) return;
+    if (profile.username_changed) {
+      setNameErr("Tu as déjà modifié ton pseudo une fois. Contacte l'admin pour le changer.");
+      return;
+    }
+    const next = username.trim();
+    if (!next || next === profile.username) return;
+    setSavingName(true);
+    setNameErr(null);
+    setNameMsg(null);
+    await supabase.from("username_history").insert({
+      user_id: user.id,
+      old_username: profile.username,
+      new_username: next,
+    });
+    const { error } = await supabase
+      .from("profiles")
+      .update({ username: next, username_changed: true })
+      .eq("id", user.id);
+    if (error) setNameErr(error.message);
+    else {
+      setProfile({ ...profile, username: next, username_changed: true });
+      setNameMsg("Pseudo modifié ✓ (dernière modification possible)");
+    }
+    setSavingName(false);
+  };
+
+  const changeEmail = async (e: FormEvent) => {
+    e.preventDefault();
+    setEmailMsg(null);
+    if (!newEmail.trim()) return;
+    const { error } = await supabase.auth.updateUser({ email: newEmail.trim() });
+    if (error) setEmailMsg("Erreur : " + error.message);
+    else setEmailMsg("Email de confirmation envoyé à la nouvelle adresse ✓");
+  };
+
+  const changePassword = async (e: FormEvent) => {
+    e.preventDefault();
+    setPassMsg(null);
+    if (newPass.length < 6) {
+      setPassMsg("Mot de passe trop court (min 6 caractères)");
+      return;
+    }
+    const { error } = await supabase.auth.updateUser({ password: newPass });
+    if (error) setPassMsg("Erreur : " + error.message);
+    else {
+      setPassMsg("Mot de passe mis à jour ✓");
+      setNewPass("");
+    }
+  };
+
+  const notifItems: { key: keyof Notifs; label: string; desc: string }[] = [
+    { key: "live", label: "Notifications lives", desc: "Quand un live démarre" },
+    { key: "posts", label: "Nouveaux posts", desc: "Posts publiés dans le groupe privé" },
+    { key: "replies", label: "Réponses commentaires", desc: "Quelqu'un répond à ton commentaire" },
+    { key: "dm", label: "Messages privés", desc: "Nouveaux messages directs" },
+  ];
+
+  return (
+    <div className="tab-content active">
+      <div className="section-header">
+        <h1>⚙️ Paramètres</h1>
+        <p>Gère ton compte, tes notifications et ton expérience</p>
+      </div>
+
+      <div className="settings-section">
+        <h2 className="settings-h2">👤 1. Compte</h2>
+        <p className="settings-sub">Le classique, mais propre.</p>
+
+        <form onSubmit={saveUsername} className="settings-row">
+          <label className="settings-label">
+            Nom / pseudo {profile?.username_changed && <span className="settings-badge-warn">verrouillé</span>}
+            <span className="settings-hint">Modifiable une seule fois.</span>
+            <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+              <input
+                className="settings-input"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                disabled={profile?.username_changed}
+                maxLength={32}
+              />
+              <button
+                className="settings-save"
+                type="submit"
+                disabled={savingName || profile?.username_changed || username.trim() === (profile?.username || "")}
+              >
+                {savingName ? "…" : "Modifier"}
+              </button>
+            </div>
+            {nameMsg && <span className="profile-msg">{nameMsg}</span>}
+            {nameErr && <span className="profile-err">{nameErr}</span>}
+          </label>
+        </form>
+
+        <form onSubmit={changeEmail} className="settings-row">
+          <label className="settings-label">
+            Email
+            <span className="settings-hint">Actuel : {user?.email}</span>
+            <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+              <input
+                className="settings-input"
+                type="email"
+                placeholder="nouvel-email@exemple.com"
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+              />
+              <button className="settings-save" type="submit" disabled={!newEmail.trim()}>
+                Changer
+              </button>
+            </div>
+            {emailMsg && <span className="profile-msg">{emailMsg}</span>}
+          </label>
+        </form>
+
+        <form onSubmit={changePassword} className="settings-row">
+          <label className="settings-label">
+            Mot de passe
+            <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+              <input
+                className="settings-input"
+                type="password"
+                placeholder="Nouveau mot de passe"
+                value={newPass}
+                onChange={(e) => setNewPass(e.target.value)}
+              />
+              <button className="settings-save" type="submit" disabled={!newPass}>
+                Modifier
+              </button>
+            </div>
+            {passMsg && <span className="profile-msg">{passMsg}</span>}
+          </label>
+        </form>
+      </div>
+
+      <div className="settings-section">
+        <h2 className="settings-h2">🔔 2. Notifications</h2>
+        <p className="settings-sub">Choisis ce que tu veux recevoir.</p>
+        {notifItems.map((n) => (
+          <label key={n.key} className="profile-toggle">
+            <span>
+              <strong>{n.label}</strong>
+              <span className="profile-hint">{n.desc}</span>
+            </span>
+            <input
+              type="checkbox"
+              checked={notifs[n.key]}
+              onChange={(e) => setNotifs({ ...notifs, [n.key]: e.target.checked })}
+            />
+          </label>
+        ))}
+      </div>
+
+      <div className="settings-section">
+        <h2 className="settings-h2">🎯 3. Expérience utilisateur</h2>
+        <p className="settings-sub">Là tu te démarques vraiment.</p>
+
+        <div className="settings-row">
+          <div className="settings-label">
+            <strong>Mode sombre / clair</strong>
+            <span className="settings-hint">Change l'apparence de toute l'application</span>
+            <div className="theme-toggle">
+              <button
+                type="button"
+                className={`theme-btn ${theme === "dark" ? "active" : ""}`}
+                onClick={() => setTheme("dark")}
+              >
+                🌙 Sombre
+              </button>
+              <button
+                type="button"
+                className={`theme-btn ${theme === "light" ? "active" : ""}`}
+                onClick={() => setTheme("light")}
+              >
+                ☀️ Clair
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="settings-row">
+          <div className="settings-label">
+            <strong>Langue</strong>
+            <span className="settings-hint">Plus de langues bientôt disponibles</span>
+            <select className="settings-input" disabled style={{ marginTop: 6, maxWidth: 240 }}>
+              <option>🇫🇷 Français</option>
+            </select>
+          </div>
+        </div>
       </div>
     </div>
   );
