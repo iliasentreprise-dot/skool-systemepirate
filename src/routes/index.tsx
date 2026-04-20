@@ -885,20 +885,9 @@ function CoachingTab() {
         ))}
       </div>
       <div className="booking-section">
-        <h3>📞 Réserver un appel stratégique privé (30 min)</h3>
-        <div style={{ fontSize: 13, color: "#9a7dbd", marginBottom: 16 }}>
-          Places limitées · Formateur disponible sur ces créneaux
-        </div>
-        <div className="slots-grid">
-          {slots.map((s, i) => (
-            <div className={`slot ${s.taken ? "taken" : ""}`} key={i}>
-              <div className="slot-day">{s.d}</div>
-              <div className="slot-time">{s.t}</div>
-              <div className="slot-avail" style={s.taken ? { color: "#ef4444" } : undefined}>
-                {s.taken ? "Complet" : "Disponible"}
-              </div>
-            </div>
-          ))}
+        <h3>🚀 Passer au niveau supérieur</h3>
+        <div style={{ fontSize: 14, color: "#d8c4f5", lineHeight: 1.6 }}>
+          Si tu as atteint les 3000€/mois avec les produits digitaux automatisés, réserve un appel pour recevoir un accompagnement one on one pour scaler tes boutiques à 30k€ par mois.
         </div>
       </div>
     </div>
