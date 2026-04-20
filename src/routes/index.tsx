@@ -679,6 +679,36 @@ function GroupeTab() {
           </div>
         );
       })}
+      {lightbox && (
+        <div
+          onClick={() => setLightbox(null)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(5, 1, 14, 0.75)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+            cursor: "zoom-out",
+            padding: 24,
+          }}
+        >
+          <img
+            src={lightbox}
+            alt=""
+            style={{
+              maxWidth: "92vw",
+              maxHeight: "92vh",
+              borderRadius: 12,
+              boxShadow: "0 20px 60px -10px rgba(168,85,247,0.5)",
+              border: "1px solid rgba(168,85,247,0.4)",
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -688,11 +718,13 @@ function CommentSection({
   items,
   onPosted,
   uploadImage,
+  onImageClick,
 }: {
   postId: string;
   items: CommentRow[];
   onPosted: () => void;
   uploadImage: (f: File) => Promise<string | null>;
+  onImageClick: (url: string) => void;
 }) {
   const { user } = useAuth();
   const [body, setBody] = useState("");
