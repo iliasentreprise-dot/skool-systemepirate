@@ -107,6 +107,8 @@ function DropDigitalPage() {
           {tab === "groupe" && <GroupeTab />}
           {tab === "coaching" && <CoachingTab />}
           {tab === "resultats" && <ResultatsTab />}
+          {tab === "profil" && <ProfilTab />}
+          {tab === "parametres" && <ParametresTab theme={theme} setTheme={setTheme} />}
         </div>
       </div>
     </div>
