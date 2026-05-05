@@ -351,3 +351,240 @@
 .dd-root.dd-light .pg-bar-wrap,
 .dd-root.dd-light .prog-bar-bg { background: #e5dcf2; }
 .dd-root.dd-light .comment { background: #f9f7fd; }
+
+
+/* ============================================================
+   NOUVELLES SECTIONS — JOURS + MINDSET + BONUS ULTIME
+   À COLLER À LA FIN DE dropdigital.css
+   ============================================================ */
+
+/* === SECTIONS PAR JOUR === */
+.dd-root .day-section {
+  margin-bottom: 36px;
+}
+
+.dd-root .day-header {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(168, 85, 247, 0.06));
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 14px;
+  padding: 18px 22px;
+  margin-bottom: 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.dd-root .day-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+}
+
+.dd-root .day-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.dd-root .day-sub {
+  font-size: 13px;
+  color: #9a7dbd;
+  margin-bottom: 10px;
+}
+
+.dd-root .day-progress-bar {
+  height: 4px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.dd-root .day-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7c3aed, #a855f7);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+/* === MINDSET SECTION === */
+.dd-root .mindset-section {
+  margin-bottom: 36px;
+}
+
+.dd-root .mindset-header {
+  background: linear-gradient(135deg, rgba(88, 28, 135, 0.3), rgba(124, 58, 237, 0.15));
+  border: 1.5px solid rgba(168, 85, 247, 0.5);
+  box-shadow: 0 0 32px rgba(168, 85, 247, 0.12);
+}
+
+.dd-root .mindset-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #a855f7, transparent);
+}
+
+.dd-root .mindset-badge {
+  background: linear-gradient(135deg, #581c87, #7c3aed) !important;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4);
+  font-size: 12px !important;
+}
+
+/* Single card grid for mindset */
+.dd-root .modules-grid-1 {
+  grid-template-columns: repeat(1, minmax(0, 360px)) !important;
+}
+
+/* === BONUS ULTIME SECTION === */
+.dd-root .bonus-ultime-section {
+  margin-bottom: 36px;
+  position: relative;
+}
+
+.dd-root .bonus-ultime-header {
+  position: relative;
+  text-align: center;
+  padding: 32px 28px 28px;
+  background: linear-gradient(135deg, rgba(120, 80, 0, 0.25), rgba(251, 191, 36, 0.08), rgba(120, 80, 0, 0.15));
+  border: 1.5px solid rgba(251, 191, 36, 0.45);
+  border-radius: 18px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.dd-root .bonus-ultime-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #fbbf24, #f59e0b, #fbbf24, transparent);
+  animation: dd-shimmer-line 2.5s ease-in-out infinite;
+}
+
+@keyframes dd-shimmer-line {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.dd-root .bonus-ultime-crown {
+  font-size: 36px;
+  margin-bottom: 8px;
+  animation: dd-crown-float 3s ease-in-out infinite;
+}
+
+@keyframes dd-crown-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.dd-root .bonus-ultime-title {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b, #fcd34d, #f59e0b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.dd-root .bonus-ultime-sub {
+  font-size: 13px;
+  color: #d4a847;
+  line-height: 1.5;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.dd-root .bonus-ultime-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+    transparent 30%,
+    rgba(251, 191, 36, 0.04) 50%,
+    transparent 70%
+  );
+  background-size: 200% 200%;
+  animation: dd-ultime-shine 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes dd-ultime-shine {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+/* Gold grid */
+.dd-root .bonus-ultime-grid {
+  grid-template-columns: repeat(2, 1fr) !important;
+}
+
+/* Ultime card styling */
+.dd-root .bonus-ultime-card {
+  border: 1.5px solid rgba(251, 191, 36, 0.35) !important;
+  background: linear-gradient(180deg, rgba(120, 80, 0, 0.15), #0f0920) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.dd-root .bonus-ultime-card:hover {
+  border-color: rgba(251, 191, 36, 0.7) !important;
+  box-shadow: 0 0 28px rgba(251, 191, 36, 0.15);
+  transform: translateY(-2px);
+}
+
+.dd-root .bonus-ultime-card-glow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+    transparent 0%,
+    rgba(251, 191, 36, 0.03) 50%,
+    transparent 100%
+  );
+  background-size: 200% 200%;
+  animation: dd-card-glow 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes dd-card-glow {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+/* Light mode adaptations */
+.dd-root.dd-light .day-header {
+  background: rgba(124, 58, 237, 0.06);
+  border-color: rgba(124, 58, 237, 0.2);
+}
+
+.dd-root.dd-light .day-title { color: #1a0d2e; }
+.dd-root.dd-light .day-sub { color: #6b4fa0; }
+
+.dd-root.dd-light .mindset-header {
+  background: rgba(88, 28, 135, 0.08);
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+.dd-root.dd-light .bonus-ultime-header {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(245, 158, 11, 0.05));
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+.dd-root.dd-light .bonus-ultime-sub { color: #92400e; }
+
+.dd-root.dd-light .bonus-ultime-card {
+  background: linear-gradient(180deg, rgba(251, 191, 36, 0.06), #fff) !important;
+  border-color: rgba(251, 191, 36, 0.4) !important;
+}
