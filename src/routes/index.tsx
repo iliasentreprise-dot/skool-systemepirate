@@ -201,7 +201,7 @@ type ModuleItem = {
 // MODULE INTRO MINDSET
 const moduleMindset: ModuleItem = {
   num: "🧠 MODULE INTRO",
-  title: "La mentalité d'un entrepreneur à +20k/mois",
+  title: "LE MINDSET DU GAGNANT",
   pct: 0,
   img: module1,
 };
