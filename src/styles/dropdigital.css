@@ -21,7 +21,7 @@
 .dd-root .new-price { font-weight: 800; font-size: 15px; color: #a855f7; }
 .dd-root .badge-red { background: #ef4444; color: #fff; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
 
-.dd-root .layout { display: flex; flex: 1; }
+.dd-root .layout { display: flex; flex: 1; align-items: flex-start; }
 
 .dd-root .menu-toggle { background: transparent; border: 1px solid #2a1a4a; color: #c4a0e8; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-right: 8px; transition: all 0.15s; padding: 0; }
 .dd-root .menu-toggle:hover { background: #1a0d30; border-color: #7c3aed; color: #fff; }
