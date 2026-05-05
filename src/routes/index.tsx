@@ -404,40 +404,9 @@ function ModulesTab() {
           <div className="bonus-ultime-shine" aria-hidden="true" />
         </div>
         <div className="modules-grid bonus-ultime-grid">
-          {modulesUltime.map((m, i) => (
-            <div className="module-card bonus-ultime-card" key={m.num + m.title}>
-              <div
-                className="module-thumb"
-                onClick={() => setLightboxIdx(flatIdx(m))}
-                style={{ cursor: "zoom-in", position: "relative" }}
-              >
-                <img
-                  src={m.img}
-                  alt={m.title}
-                  loading="lazy"
-                  style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.4)" }}
-                />
-                <div style={{
-                  position: "absolute", inset: 0,
-                  display: "flex", flexDirection: "column",
-                  alignItems: "center", justifyContent: "center", gap: 8,
-                }}>
-                  <span style={{ fontSize: 32 }}>🔒</span>
-                  <span style={{ fontSize: 12, color: "#fbbf24", fontWeight: 800, letterSpacing: 1 }}>ACCÈS RÉSERVÉ</span>
-                </div>
-              </div>
-              <div className="module-info" style={{ background: "linear-gradient(180deg,rgba(251,191,36,0.08),transparent)" }}>
-                <div className="module-num" style={{ color: "#fbbf24" }}>{m.num}</div>
-                <div className="module-title" style={{ color: "#fff" }}>{m.title}</div>
-                <div className="prog-wrap">
-                  <div className="prog-bar-bg">
-                    <div className="prog-bar-fill" style={{ width: "0%", background: "linear-gradient(90deg,#d97706,#fbbf24)" }} />
-                  </div>
-                  <span className="prog-pct" style={{ color: "#fbbf24" }}>🔒</span>
-                </div>
-              </div>
-              {/* Gold shimmer border */}
-              <div className="bonus-ultime-card-glow" aria-hidden="true" />
+          {modulesUltime.map((m) => (
+            <div key={m.num + m.title}>
+              {renderCard(m, flatIdx(m))}
             </div>
           ))}
         </div>
