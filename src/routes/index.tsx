@@ -185,15 +185,73 @@ function Sidebar({ tab, setTab, open }: { tab: TabKey; setTab: (t: TabKey) => vo
   );
 }
 
-const modules = [
-  { num: "Module 1", title: "Présentation du système PIRATE", pct: 0, img: module1 },
-  { num: "Module 2", title: "L'Offre Irrésistible", pct: 0, img: module2 },
-  { num: "Module 3", title: "Créer ton produit digital", pct: 0, img: module3 },
-  { num: "Module 4", title: "Le Tunnel de vente Pirate", pct: 0, img: module4 },
-  { num: "Module 5", title: "Stratégie Carrousels PIRATE", pct: 0, img: module5 },
-  { num: "Module 6", title: "Les Lives TikTok", pct: 0, img: module7 },
-  { num: "Module 7 — 🔒 SECRET", title: "L'OUTIL d'automatisation TikTok SECRET", pct: 0, img: module6 },
+// ============================================================
+// MODULE STRUCTURE
+// ============================================================
+
+type ModuleItem = {
+  num: string;
+  title: string;
+  pct: number;
+  img: string;
+  badge?: string;
+  badgeColor?: string;
+};
+
+// MODULE INTRO MINDSET
+const moduleMindset: ModuleItem = {
+  num: "🧠 MODULE INTRO",
+  title: "La mentalité d'un entrepreneur à +20k/mois",
+  pct: 0,
+  img: module1,
+};
+
+// JOUR 1 — Fondations & Setup
+const modulesJour1: ModuleItem[] = [
+  { num: "Jour 1 · 1", title: "Préparer son compte TikTok", pct: 0, img: module2, badge: "NEW", badgeColor: "#a855f7" },
+  { num: "Jour 1 · 2", title: "L'Offre Irrésistible", pct: 0, img: module3 },
+  { num: "Jour 1 · 3", title: "Créer ton produit digital", pct: 0, img: module4 },
 ];
+
+// JOUR 2 — Construction
+const modulesJour2: ModuleItem[] = [
+  { num: "Jour 2 · 1", title: "Le Tunnel de vente Pirate", pct: 0, img: module5 },
+  { num: "Jour 2 · 2", title: "Stratégie Carrousels PIRATE", pct: 0, img: module6 },
+];
+
+// JOUR 3 — Vente & Lancement
+const modulesJour3: ModuleItem[] = [
+  { num: "Jour 3 · 1", title: "Les Lives TikTok", pct: 0, img: module7 },
+  { num: "Jour 3 · 2", title: "Closer en DM avec une méthode interdite", pct: 0, img: module2, badge: "NEW", badgeColor: "#ef4444" },
+  { num: "Jour 3 · 3", title: "🧲 LeadMagnet ULTIME", pct: 0, img: module3, badge: "NEW", badgeColor: "#ef4444" },
+];
+
+// MODULES BONUS
+const modulesBonus: ModuleItem[] = [
+  { num: "🎁 BONUS · 1", title: "Optimisation avancée", pct: 0, img: module4 },
+  { num: "🎁 BONUS · 2", title: "La puissance de l'emailing", pct: 0, img: module5, badge: "NEW", badgeColor: "#f59e0b" },
+  { num: "🎁 BONUS · 3", title: "Comment déclarer", pct: 0, img: module6 },
+];
+
+// BONUS ULTIME (2 cartes)
+const modulesUltime: ModuleItem[] = [
+  { num: "🔒 SECRET", title: "L'OUTIL d'automatisation TikTok SECRET", pct: 0, img: module7 },
+  { num: "🔒 EXCLUSIF", title: "Logiciel de BOOST d'abonnés ULTIME", pct: 0, img: module1 },
+];
+
+// All modules flat for lightbox navigation
+const allModules: ModuleItem[] = [
+  moduleMindset,
+  ...modulesJour1,
+  ...modulesJour2,
+  ...modulesJour3,
+  ...modulesBonus,
+  ...modulesUltime,
+];
+
+// ============================================================
+// MODULES TAB
+// ============================================================
 
 function ModulesTab() {
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
@@ -202,8 +260,8 @@ function ModulesTab() {
     if (lightboxIdx === null) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setLightboxIdx(null);
-      else if (e.key === "ArrowRight") setLightboxIdx((i) => (i === null ? i : (i + 1) % modules.length));
-      else if (e.key === "ArrowLeft") setLightboxIdx((i) => (i === null ? i : (i - 1 + modules.length) % modules.length));
+      else if (e.key === "ArrowRight") setLightboxIdx((i) => (i === null ? i : (i + 1) % allModules.length));
+      else if (e.key === "ArrowLeft") setLightboxIdx((i) => (i === null ? i : (i - 1 + allModules.length) % allModules.length));
     };
     window.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
@@ -213,7 +271,46 @@ function ModulesTab() {
     };
   }, [lightboxIdx]);
 
-  const current = lightboxIdx !== null ? modules[lightboxIdx] : null;
+  const current = lightboxIdx !== null ? allModules[lightboxIdx] : null;
+
+  // Helper to get flat index for a module
+  const flatIdx = (m: ModuleItem) => allModules.findIndex((x) => x === m);
+
+  const renderCard = (m: ModuleItem, idx: number) => (
+    <div className="module-card" key={m.num + m.title}>
+      <div
+        className="module-thumb"
+        onClick={() => setLightboxIdx(idx)}
+        style={{ cursor: "zoom-in" }}
+      >
+        <img
+          src={m.img}
+          alt={m.title}
+          loading="lazy"
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
+        <div className="play-btn" />
+        {m.badge && (
+          <span style={{
+            position: "absolute", top: 8, right: 8,
+            background: m.badgeColor || "#a855f7",
+            color: "#fff", fontSize: 10, fontWeight: 800,
+            padding: "3px 8px", borderRadius: 4, letterSpacing: 0.5,
+          }}>{m.badge}</span>
+        )}
+      </div>
+      <div className="module-info">
+        <div className="module-num">{m.num}</div>
+        <div className="module-title">{m.title}</div>
+        <div className="prog-wrap">
+          <div className="prog-bar-bg">
+            <div className="prog-bar-fill" style={{ width: `${m.pct}%` }} />
+          </div>
+          <span className="prog-pct">{m.pct}%</span>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="tab-content active">
@@ -221,6 +318,7 @@ function ModulesTab() {
         <h1>🏴 Système Pirate — Ma Formation</h1>
         <p>Vendre des produits digitaux sur TikTok en automatique · Sans visage · Sans audience · Sans montage</p>
       </div>
+
       <div className="progress-global">
         <span className="pg-label">Progression globale</span>
         <div className="pg-bar-wrap">
@@ -228,36 +326,125 @@ function ModulesTab() {
         </div>
         <span className="pg-pct">0%</span>
       </div>
-      <div className="modules-grid">
-        {modules.map((m, idx) => (
-          <div className="module-card" key={m.num}>
-            <div
-              className="module-thumb"
-              onClick={() => setLightboxIdx(idx)}
-              style={{ cursor: "zoom-in" }}
-            >
-              <img
-                src={m.img}
-                alt={m.title}
-                loading="lazy"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-              <div className="play-btn" />
-            </div>
-            <div className="module-info">
-              <div className="module-num">{m.num}</div>
-              <div className="module-title">{m.title}</div>
-              <div className="prog-wrap">
-                <div className="prog-bar-bg">
-                  <div className="prog-bar-fill" style={{ width: `${m.pct}%` }} />
-                </div>
-                <span className="prog-pct">{m.pct}%</span>
-              </div>
-            </div>
-          </div>
-        ))}
+
+      {/* ===== MODULE INTRO MINDSET ===== */}
+      <div className="day-section mindset-section">
+        <div className="day-header mindset-header">
+          <div className="day-badge mindset-badge">🧠 COMMENCER ICI</div>
+          <div className="day-title">La mentalité d'un entrepreneur à +20k/mois</div>
+          <div className="day-sub">Présentation du système PIRATE · Mindset · Motivation</div>
+        </div>
+        <div className="modules-grid modules-grid-1">
+          {renderCard(moduleMindset, flatIdx(moduleMindset))}
+        </div>
       </div>
 
+      {/* ===== JOUR 1 ===== */}
+      <div className="day-section">
+        <div className="day-header">
+          <div className="day-badge" style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7)" }}>JOUR 1</div>
+          <div className="day-title">Fondations & Setup</div>
+          <div className="day-sub">Prépare ton compte · Crée ton offre · Lance ton produit</div>
+          <div className="day-progress-bar">
+            <div className="day-progress-fill" style={{ width: "0%" }} />
+          </div>
+        </div>
+        <div className="modules-grid">
+          {modulesJour1.map((m) => renderCard(m, flatIdx(m)))}
+        </div>
+      </div>
+
+      {/* ===== JOUR 2 ===== */}
+      <div className="day-section">
+        <div className="day-header">
+          <div className="day-badge" style={{ background: "linear-gradient(135deg,#0891b2,#06b6d4)" }}>JOUR 2</div>
+          <div className="day-title">Construction</div>
+          <div className="day-sub">Tunnel de vente · Stratégie Carrousels · Automatisation</div>
+          <div className="day-progress-bar">
+            <div className="day-progress-fill" style={{ width: "0%", background: "linear-gradient(90deg,#0891b2,#06b6d4)" }} />
+          </div>
+        </div>
+        <div className="modules-grid">
+          {modulesJour2.map((m) => renderCard(m, flatIdx(m)))}
+        </div>
+      </div>
+
+      {/* ===== JOUR 3 ===== */}
+      <div className="day-section">
+        <div className="day-header">
+          <div className="day-badge" style={{ background: "linear-gradient(135deg,#059669,#10b981)" }}>JOUR 3</div>
+          <div className="day-title">Vente & Lancement</div>
+          <div className="day-sub">Lives TikTok · Closer en DM · LeadMagnet · Retargeting</div>
+          <div className="day-progress-bar">
+            <div className="day-progress-fill" style={{ width: "0%", background: "linear-gradient(90deg,#059669,#10b981)" }} />
+          </div>
+        </div>
+        <div className="modules-grid">
+          {modulesJour3.map((m) => renderCard(m, flatIdx(m)))}
+        </div>
+      </div>
+
+      {/* ===== MODULES BONUS ===== */}
+      <div className="day-section">
+        <div className="day-header">
+          <div className="day-badge" style={{ background: "linear-gradient(135deg,#d97706,#f59e0b)" }}>🎁 MODULES BONUS</div>
+          <div className="day-title">Bonus</div>
+          <div className="day-sub">Optimisation · Emailing · Déclaration</div>
+        </div>
+        <div className="modules-grid">
+          {modulesBonus.map((m) => renderCard(m, flatIdx(m)))}
+        </div>
+      </div>
+
+      {/* ===== BONUS ULTIME ===== */}
+      <div className="bonus-ultime-section">
+        <div className="bonus-ultime-header">
+          <div className="bonus-ultime-crown">👑</div>
+          <div className="bonus-ultime-title">BONUS ULTIME</div>
+          <div className="bonus-ultime-sub">Accès exclusif aux outils secrets qui font tourner le système en automatique</div>
+          <div className="bonus-ultime-shine" aria-hidden="true" />
+        </div>
+        <div className="modules-grid bonus-ultime-grid">
+          {modulesUltime.map((m, i) => (
+            <div className="module-card bonus-ultime-card" key={m.num + m.title}>
+              <div
+                className="module-thumb"
+                onClick={() => setLightboxIdx(flatIdx(m))}
+                style={{ cursor: "zoom-in", position: "relative" }}
+              >
+                <img
+                  src={m.img}
+                  alt={m.title}
+                  loading="lazy"
+                  style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.4)" }}
+                />
+                <div style={{
+                  position: "absolute", inset: 0,
+                  display: "flex", flexDirection: "column",
+                  alignItems: "center", justifyContent: "center", gap: 8,
+                }}>
+                  <span style={{ fontSize: 32 }}>🔒</span>
+                  <span style={{ fontSize: 12, color: "#fbbf24", fontWeight: 800, letterSpacing: 1 }}>ACCÈS RÉSERVÉ</span>
+                </div>
+              </div>
+              <div className="module-info" style={{ background: "linear-gradient(180deg,rgba(251,191,36,0.08),transparent)" }}>
+                <div className="module-num" style={{ color: "#fbbf24" }}>{m.num}</div>
+                <div className="module-title" style={{ color: "#fff" }}>{m.title}</div>
+                <div className="prog-wrap">
+                  <div className="prog-bar-bg">
+                    <div className="prog-bar-fill" style={{ width: "0%", background: "linear-gradient(90deg,#d97706,#fbbf24)" }} />
+                  </div>
+                  <span className="prog-pct" style={{ color: "#fbbf24" }}>🔒</span>
+                </div>
+              </div>
+              {/* Gold shimmer border */}
+              <div className="bonus-ultime-card-glow" aria-hidden="true" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ===== CTA ===== */}
       <div className="cta-section">
         <div className="cta-text">
           <h2>🏴 Offre Live — Disparaît à la fin du live</h2>
@@ -271,13 +458,14 @@ function ModulesTab() {
         <button className="cta-btn">Réserver mon accès →</button>
       </div>
 
+      {/* LIGHTBOX */}
       {current && lightboxIdx !== null && (
         <div className="lightbox-overlay" onClick={() => setLightboxIdx(null)}>
           <button
             className="lightbox-nav lightbox-prev"
             onClick={(e) => {
               e.stopPropagation();
-              setLightboxIdx((i) => (i === null ? i : (i - 1 + modules.length) % modules.length));
+              setLightboxIdx((i) => (i === null ? i : (i - 1 + allModules.length) % allModules.length));
             }}
             aria-label="Précédent"
           >
@@ -302,7 +490,7 @@ function ModulesTab() {
             className="lightbox-nav lightbox-next"
             onClick={(e) => {
               e.stopPropagation();
-              setLightboxIdx((i) => (i === null ? i : (i + 1) % modules.length));
+              setLightboxIdx((i) => (i === null ? i : (i + 1) % allModules.length));
             }}
             aria-label="Suivant"
           >
@@ -320,6 +508,10 @@ function ModulesTab() {
     </div>
   );
 }
+
+// ============================================================
+// GROUPE TAB (unchanged)
+// ============================================================
 
 type OnlineMember = {
   user_id: string;
@@ -389,7 +581,6 @@ function GroupeTab() {
   const [error, setError] = useState<string | null>(null);
   const [lightbox, setLightbox] = useState<string | null>(null);
 
-  // Load profile (for presence + author display)
   useEffect(() => {
     if (!user) return;
     let active = true;
@@ -429,7 +620,6 @@ function GroupeTab() {
           }
         });
 
-      // cleanup attached via active flag below
       (window as unknown as { __ddPresenceChannel?: ReturnType<typeof supabase.channel> }).__ddPresenceChannel = channel;
     })();
 
@@ -443,7 +633,6 @@ function GroupeTab() {
     };
   }, [user]);
 
-  // Load posts + realtime
   const loadPosts = async () => {
     const { data } = await supabase
       .from("posts")
@@ -562,16 +751,7 @@ function GroupeTab() {
         <p>+37 pirates actifs · Entraide quotidienne · Partage de résultats · Accès direct au formateur</p>
         <button className="discord-btn">🎮 Rejoindre le Discord</button>
       </div>
-      <div
-        style={{
-          fontSize: 13,
-          fontWeight: 700,
-          color: "#6b4fa0",
-          textTransform: "uppercase",
-          letterSpacing: 1,
-          marginBottom: 14,
-        }}
-      >
+      <div style={{ fontSize: 13, fontWeight: 700, color: "#6b4fa0", textTransform: "uppercase", letterSpacing: 1, marginBottom: 14 }}>
         Membres en ligne ({Math.max(online.length, user ? 1 : 0)})
       </div>
       <div className="members-grid">
@@ -601,17 +781,7 @@ function GroupeTab() {
         ))}
       </div>
 
-      <div
-        style={{
-          fontSize: 13,
-          fontWeight: 700,
-          color: "#6b4fa0",
-          textTransform: "uppercase",
-          letterSpacing: 1,
-          marginBottom: 14,
-          marginTop: 28,
-        }}
-      >
+      <div style={{ fontSize: 13, fontWeight: 700, color: "#6b4fa0", textTransform: "uppercase", letterSpacing: 1, marginBottom: 14, marginTop: 28 }}>
         Publier un post
       </div>
       <form className="composer" onSubmit={submitPost}>
@@ -648,16 +818,7 @@ function GroupeTab() {
         {error && <div className="composer-error">{error}</div>}
       </form>
 
-      <div
-        style={{
-          fontSize: 13,
-          fontWeight: 700,
-          color: "#6b4fa0",
-          textTransform: "uppercase",
-          letterSpacing: 1,
-          margin: "20px 0 14px",
-        }}
-      >
+      <div style={{ fontSize: 13, fontWeight: 700, color: "#6b4fa0", textTransform: "uppercase", letterSpacing: 1, margin: "20px 0 14px" }}>
         Derniers posts
       </div>
       {posts.length === 0 && (
@@ -710,25 +871,19 @@ function GroupeTab() {
         <div
           onClick={() => setLightbox(null)}
           style={{
-            position: "fixed",
-            inset: 0,
+            position: "fixed", inset: 0,
             background: "rgba(5, 1, 14, 0.75)",
             backdropFilter: "blur(12px)",
             WebkitBackdropFilter: "blur(12px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 9999,
-            cursor: "zoom-out",
-            padding: 24,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            zIndex: 9999, cursor: "zoom-out", padding: 24,
           }}
         >
           <img
             src={lightbox}
             alt=""
             style={{
-              maxWidth: "92vw",
-              maxHeight: "92vh",
+              maxWidth: "92vw", maxHeight: "92vh",
               borderRadius: 12,
               boxShadow: "0 20px 60px -10px rgba(168,85,247,0.5)",
               border: "1px solid rgba(168,85,247,0.4)",
@@ -849,6 +1004,10 @@ function CommentSection({
   );
 }
 
+// ============================================================
+// COACHING TAB (unchanged)
+// ============================================================
+
 const coachings = [
   {
     tag: "🔴 LIVE À 21H",
@@ -885,15 +1044,6 @@ const coachings = [
   },
 ];
 
-const slots = [
-  { d: "Lundi 21 Avril", t: "10h00", taken: false },
-  { d: "Lundi 21 Avril", t: "14h00", taken: true },
-  { d: "Mardi 22 Avril", t: "11h00", taken: false },
-  { d: "Mardi 22 Avril", t: "16h00", taken: true },
-  { d: "Jeudi 24 Avril", t: "10h00", taken: false },
-  { d: "Vendredi 25 Avril", t: "15h00", taken: false },
-];
-
 function CoachingTab() {
   return (
     <div className="tab-content active">
@@ -921,6 +1071,10 @@ function CoachingTab() {
   );
 }
 
+// ============================================================
+// RESULTATS TAB (unchanged)
+// ============================================================
+
 const stats = [
   { n: "37", l: "Pirates formés" },
   { n: "21", l: "Premières ventes" },
@@ -930,52 +1084,28 @@ const stats = [
 
 const results = [
   {
-    i: "CR",
-    c: "#7c3aed",
-    name: "Camille R.",
-    sub: "Ebook bien-être · Lyon",
-    amount: "3 200€ / mois",
-    desc: "Partie de zéro, aucune audience. Ses carrousels TikTok tournent en continu. Résultat atteint en 8 semaines.",
+    i: "CR", c: "#7c3aed", name: "Camille R.", sub: "Ebook bien-être · Lyon",
+    amount: "3 200€ / mois", desc: "Partie de zéro, aucune audience. Ses carrousels TikTok tournent en continu. Résultat atteint en 8 semaines.",
   },
   {
-    i: "MB",
-    c: "#0891b2",
-    name: "Maxime B.",
-    sub: "Formation finance · Paris",
-    amount: "7 800€ / mois",
-    desc: "Mini-formation budgeting vendue 47€. Il poste 3 carrousels par semaine, sans montrer son visage.",
+    i: "MB", c: "#0891b2", name: "Maxime B.", sub: "Formation finance · Paris",
+    amount: "7 800€ / mois", desc: "Mini-formation budgeting vendue 47€. Il poste 3 carrousels par semaine, sans montrer son visage.",
   },
   {
-    i: "NK",
-    c: "#be185d",
-    name: "Noémie K.",
-    sub: "Ebook recettes · Bordeaux",
-    amount: "1 450€ / mois",
-    desc: "Première vente en 4 jours. Ebook à 19€ vendu en automatique grâce au tunnel pirate.",
+    i: "NK", c: "#be185d", name: "Noémie K.", sub: "Ebook recettes · Bordeaux",
+    amount: "1 450€ / mois", desc: "Première vente en 4 jours. Ebook à 19€ vendu en automatique grâce au tunnel pirate.",
   },
   {
-    i: "YD",
-    c: "#b45309",
-    name: "Yacine D.",
-    sub: "Formation productivité · Lille",
-    amount: "12 300€ / mois",
-    desc: "A utilisé l'outil d'automatisation TikTok SECRET. Ses vidéos tournent H24 sans intervention.",
+    i: "YD", c: "#b45309", name: "Yacine D.", sub: "Formation productivité · Lille",
+    amount: "12 300€ / mois", desc: "A utilisé l'outil d'automatisation TikTok SECRET. Ses vidéos tournent H24 sans intervention.",
   },
   {
-    i: "LP",
-    c: "#065f46",
-    name: "Laura P.",
-    sub: "Coaching mindset · Nice",
-    amount: "5 600€ / mois",
-    desc: "Lancée sans budget pub. Tunnel de vente créé en 1 weekend, premières ventes dès le lundi.",
+    i: "LP", c: "#065f46", name: "Laura P.", sub: "Coaching mindset · Nice",
+    amount: "5 600€ / mois", desc: "Lancée sans budget pub. Tunnel de vente créé en 1 weekend, premières ventes dès le lundi.",
   },
   {
-    i: "AR",
-    c: "#4c1d95",
-    name: "Antoine R.",
-    sub: "Outil SaaS · Marseille",
-    amount: "28 000€ / mois",
-    desc: "A créé un outil digital vendu 97€/mois en récurrent. Le Système Pirate lui a permis de scaler sans pub.",
+    i: "AR", c: "#4c1d95", name: "Antoine R.", sub: "Outil SaaS · Marseille",
+    amount: "28 000€ / mois", desc: "A créé un outil digital vendu 97€/mois en récurrent. Le Système Pirate lui a permis de scaler sans pub.",
   },
 ];
 
@@ -998,9 +1128,7 @@ function ResultatsTab() {
         {results.map((r) => (
           <div className="result-card" key={r.name}>
             <div className="result-header">
-              <div className="result-avatar" style={{ background: r.c }}>
-                {r.i}
-              </div>
+              <div className="result-avatar" style={{ background: r.c }}>{r.i}</div>
               <div>
                 <div className="result-name">{r.name}</div>
                 <div className="result-sub">{r.sub}</div>
@@ -1018,9 +1146,10 @@ function ResultatsTab() {
   );
 }
 
-// ============================================================================
-// Profil Tab
-// ============================================================================
+// ============================================================
+// PROFIL TAB (unchanged)
+// ============================================================
+
 type ProfileData = {
   id: string;
   username: string | null;
@@ -1062,20 +1191,12 @@ function ProfilTab() {
   const onAvatarChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
-    if (file.size > 3 * 1024 * 1024) {
-      setErr("Image trop lourde (max 3 Mo).");
-      return;
-    }
-    setUploading(true);
-    setErr(null);
+    if (file.size > 3 * 1024 * 1024) { setErr("Image trop lourde (max 3 Mo)."); return; }
+    setUploading(true); setErr(null);
     const ext = file.name.split(".").pop() || "jpg";
     const path = `${user.id}/avatar-${Date.now()}.${ext}`;
     const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
-    if (upErr) {
-      setErr(upErr.message);
-      setUploading(false);
-      return;
-    }
+    if (upErr) { setErr(upErr.message); setUploading(false); return; }
     const { data } = supabase.storage.from("avatars").getPublicUrl(path);
     const url = data.publicUrl;
     const { error: updErr } = await supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id);
@@ -1091,18 +1212,13 @@ function ProfilTab() {
   const saveProfile = async (e: FormEvent) => {
     e.preventDefault();
     if (!user || !profile) return;
-    setSaving(true);
-    setErr(null);
-    setMsg(null);
+    setSaving(true); setErr(null); setMsg(null);
     const { error } = await supabase
       .from("profiles")
       .update({ bio: bio.slice(0, 500), show_progression: showProg })
       .eq("id", user.id);
     if (error) setErr(error.message);
-    else {
-      setMsg("Profil sauvegardé ✓");
-      setTimeout(() => setMsg(null), 2500);
-    }
+    else { setMsg("Profil sauvegardé ✓"); setTimeout(() => setMsg(null), 2500); }
     setSaving(false);
   };
 
@@ -1118,7 +1234,6 @@ function ProfilTab() {
         <h1>👤 Mon Profil</h1>
         <p>Gère ta photo, ta bio et la visibilité de ta progression</p>
       </div>
-
       <div className="profile-card">
         <div className="profile-avatar-wrap">
           {profile?.avatar_url ? (
@@ -1138,7 +1253,6 @@ function ProfilTab() {
           <div className="profile-email">{user?.email}</div>
         </div>
       </div>
-
       <form className="profile-form" onSubmit={saveProfile}>
         <label className="profile-label">
           Bio
@@ -1152,7 +1266,6 @@ function ProfilTab() {
           />
           <span className="profile-counter">{bio.length}/500</span>
         </label>
-
         <label className="profile-toggle">
           <span>
             <strong>Afficher ma progression</strong>
@@ -1160,7 +1273,6 @@ function ProfilTab() {
           </span>
           <input type="checkbox" checked={showProg} onChange={(e) => setShowProg(e.target.checked)} />
         </label>
-
         {showProg && (
           <div className="profile-progression">
             <div className="pg-label">Ma progression globale</div>
@@ -1170,7 +1282,6 @@ function ProfilTab() {
             <div style={{ marginTop: 8, fontSize: 13, color: "#9a7dbd" }}>0% — Continue, pirate ! 🏴‍☠️</div>
           </div>
         )}
-
         <div className="profile-actions">
           <button type="submit" className="profile-save" disabled={saving}>
             {saving ? "Sauvegarde…" : "Sauvegarder"}
@@ -1183,9 +1294,10 @@ function ProfilTab() {
   );
 }
 
-// ============================================================================
-// Paramètres Tab
-// ============================================================================
+// ============================================================
+// PARAMETRES TAB (unchanged)
+// ============================================================
+
 function ParametresTab({ theme, setTheme }: { theme: "dark" | "light"; setTheme: (t: "dark" | "light") => void }) {
   const { user } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -1236,13 +1348,9 @@ function ParametresTab({ theme, setTheme }: { theme: "dark" | "light"; setTheme:
     }
     const next = username.trim();
     if (!next || next === profile.username) return;
-    setSavingName(true);
-    setNameErr(null);
-    setNameMsg(null);
+    setSavingName(true); setNameErr(null); setNameMsg(null);
     await supabase.from("username_history").insert({
-      user_id: user.id,
-      old_username: profile.username,
-      new_username: next,
+      user_id: user.id, old_username: profile.username, new_username: next,
     });
     const { error } = await supabase
       .from("profiles")
@@ -1268,16 +1376,10 @@ function ParametresTab({ theme, setTheme }: { theme: "dark" | "light"; setTheme:
   const changePassword = async (e: FormEvent) => {
     e.preventDefault();
     setPassMsg(null);
-    if (newPass.length < 6) {
-      setPassMsg("Mot de passe trop court (min 6 caractères)");
-      return;
-    }
+    if (newPass.length < 6) { setPassMsg("Mot de passe trop court (min 6 caractères)"); return; }
     const { error } = await supabase.auth.updateUser({ password: newPass });
     if (error) setPassMsg("Erreur : " + error.message);
-    else {
-      setPassMsg("Mot de passe mis à jour ✓");
-      setNewPass("");
-    }
+    else { setPassMsg("Mot de passe mis à jour ✓"); setNewPass(""); }
   };
 
   const notifItems: { key: keyof Notifs; label: string; desc: string }[] = [
@@ -1297,24 +1399,13 @@ function ParametresTab({ theme, setTheme }: { theme: "dark" | "light"; setTheme:
       <div className="settings-section">
         <h2 className="settings-h2">👤 1. Compte</h2>
         <p className="settings-sub">Le classique, mais propre.</p>
-
         <form onSubmit={saveUsername} className="settings-row">
           <label className="settings-label">
             Nom / pseudo {profile?.username_changed && <span className="settings-badge-warn">verrouillé</span>}
             <span className="settings-hint">Modifiable une seule fois.</span>
             <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
-              <input
-                className="settings-input"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                disabled={profile?.username_changed}
-                maxLength={32}
-              />
-              <button
-                className="settings-save"
-                type="submit"
-                disabled={savingName || profile?.username_changed || username.trim() === (profile?.username || "")}
-              >
+              <input className="settings-input" value={username} onChange={(e) => setUsername(e.target.value)} disabled={profile?.username_changed} maxLength={32} />
+              <button className="settings-save" type="submit" disabled={savingName || profile?.username_changed || username.trim() === (profile?.username || "")}>
                 {savingName ? "…" : "Modifier"}
               </button>
             </div>
@@ -1322,41 +1413,23 @@ function ParametresTab({ theme, setTheme }: { theme: "dark" | "light"; setTheme:
             {nameErr && <span className="profile-err">{nameErr}</span>}
           </label>
         </form>
-
         <form onSubmit={changeEmail} className="settings-row">
           <label className="settings-label">
             Email
             <span className="settings-hint">Actuel : {user?.email}</span>
             <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
-              <input
-                className="settings-input"
-                type="email"
-                placeholder="nouvel-email@exemple.com"
-                value={newEmail}
-                onChange={(e) => setNewEmail(e.target.value)}
-              />
-              <button className="settings-save" type="submit" disabled={!newEmail.trim()}>
-                Changer
-              </button>
+              <input className="settings-input" type="email" placeholder="nouvel-email@exemple.com" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
+              <button className="settings-save" type="submit" disabled={!newEmail.trim()}>Changer</button>
             </div>
             {emailMsg && <span className="profile-msg">{emailMsg}</span>}
           </label>
         </form>
-
         <form onSubmit={changePassword} className="settings-row">
           <label className="settings-label">
             Mot de passe
             <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
-              <input
-                className="settings-input"
-                type="password"
-                placeholder="Nouveau mot de passe"
-                value={newPass}
-                onChange={(e) => setNewPass(e.target.value)}
-              />
-              <button className="settings-save" type="submit" disabled={!newPass}>
-                Modifier
-              </button>
+              <input className="settings-input" type="password" placeholder="Nouveau mot de passe" value={newPass} onChange={(e) => setNewPass(e.target.value)} />
+              <button className="settings-save" type="submit" disabled={!newPass}>Modifier</button>
             </div>
             {passMsg && <span className="profile-msg">{passMsg}</span>}
           </label>
@@ -1372,11 +1445,7 @@ function ParametresTab({ theme, setTheme }: { theme: "dark" | "light"; setTheme:
               <strong>{n.label}</strong>
               <span className="profile-hint">{n.desc}</span>
             </span>
-            <input
-              type="checkbox"
-              checked={notifs[n.key]}
-              onChange={(e) => setNotifs({ ...notifs, [n.key]: e.target.checked })}
-            />
+            <input type="checkbox" checked={notifs[n.key]} onChange={(e) => setNotifs({ ...notifs, [n.key]: e.target.checked })} />
           </label>
         ))}
       </div>
@@ -1384,30 +1453,16 @@ function ParametresTab({ theme, setTheme }: { theme: "dark" | "light"; setTheme:
       <div className="settings-section">
         <h2 className="settings-h2">🎯 3. Expérience utilisateur</h2>
         <p className="settings-sub">Là tu te démarques vraiment.</p>
-
         <div className="settings-row">
           <div className="settings-label">
             <strong>Mode sombre / clair</strong>
             <span className="settings-hint">Change l'apparence de toute l'application</span>
             <div className="theme-toggle">
-              <button
-                type="button"
-                className={`theme-btn ${theme === "dark" ? "active" : ""}`}
-                onClick={() => setTheme("dark")}
-              >
-                🌙 Sombre
-              </button>
-              <button
-                type="button"
-                className={`theme-btn ${theme === "light" ? "active" : ""}`}
-                onClick={() => setTheme("light")}
-              >
-                ☀️ Clair
-              </button>
+              <button type="button" className={`theme-btn ${theme === "dark" ? "active" : ""}`} onClick={() => setTheme("dark")}>🌙 Sombre</button>
+              <button type="button" className={`theme-btn ${theme === "light" ? "active" : ""}`} onClick={() => setTheme("light")}>☀️ Clair</button>
             </div>
           </div>
         </div>
-
         <div className="settings-row">
           <div className="settings-label">
             <strong>Langue</strong>
