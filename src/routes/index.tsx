@@ -330,7 +330,7 @@ function ModulesTab() {
       <div className="day-section mindset-section">
         <div className="day-header mindset-header">
           <div className="day-badge mindset-badge">🧠 COMMENCER ICI</div>
-          <div className="day-title">La mentalité d'un entrepreneur à +20k/mois</div>
+          <div className="day-title">LE MINDSET DU GAGNANT</div>
           <div className="day-sub">Présentation du système PIRATE · Mindset · Motivation</div>
         </div>
         <div className="modules-grid modules-grid-1">
