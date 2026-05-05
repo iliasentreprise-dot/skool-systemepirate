@@ -228,15 +228,14 @@ const modulesJour3: ModuleItem[] = [
 
 // MODULES BONUS
 const modulesBonus: ModuleItem[] = [
-  { num: "🎁 BONUS · 1", title: "Optimisation avancée", pct: 0, img: module4 },
-  { num: "🎁 BONUS · 2", title: "La puissance de l'emailing", pct: 0, img: module5, badge: "NEW", badgeColor: "#f59e0b" },
-  { num: "🎁 BONUS · 3", title: "Comment déclarer", pct: 0, img: module6 },
+  { num: "🎁 BONUS · 1", title: "La puissance de l'emailing", pct: 0, img: module5, badge: "NEW", badgeColor: "#f59e0b" },
+  { num: "🎁 BONUS · 2", title: "Comment déclarer", pct: 0, img: module6 },
 ];
 
 // BONUS ULTIME (2 cartes)
 const modulesUltime: ModuleItem[] = [
-  { num: "🔒 SECRET", title: "L'OUTIL d'automatisation TikTok SECRET", pct: 0, img: module7 },
-  { num: "🔒 EXCLUSIF", title: "Logiciel de BOOST d'abonnés ULTIME", pct: 0, img: module1 },
+  { num: "⚡ MODULE SECRET", title: "L'OUTIL d'automatisation TikTok SECRET", pct: 0, img: module7, badge: "EXCLUSIF", badgeColor: "#f59e0b" },
+  { num: "🚀 MODULE EXCLUSIF", title: "Logiciel de BOOST d'abonnés ULTIME", pct: 0, img: module1, badge: "EXCLUSIF", badgeColor: "#f59e0b" },
 ];
 
 // All modules flat for lightbox navigation
