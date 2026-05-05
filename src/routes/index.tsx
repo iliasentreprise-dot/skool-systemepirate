@@ -397,18 +397,71 @@ function ModulesTab() {
 
       {/* ===== BONUS ULTIME ===== */}
       <div className="bonus-ultime-section">
-        <div className="bonus-ultime-header">
-          <div className="bonus-ultime-crown">👑</div>
-          <div className="bonus-ultime-title">BONUS ULTIME</div>
-          <div className="bonus-ultime-sub">Accès exclusif aux outils secrets qui font tourner le système en automatique</div>
-          <div className="bonus-ultime-shine" aria-hidden="true" />
-        </div>
-        <div className="modules-grid bonus-ultime-grid">
-          {modulesUltime.map((m) => (
-            <div key={m.num + m.title}>
-              {renderCard(m, flatIdx(m))}
+        <div className="bonus-ultime-wrapper">
+          {/* Étoiles flottantes */}
+          <div className="bonus-ultime-stars" aria-hidden="true">
+            <span>✦</span>
+            <span>✧</span>
+            <span>✦</span>
+            <span>✧</span>
+            <span>✦</span>
+            <span>✧</span>
+          </div>
+
+          {/* Header */}
+          <div className="bonus-ultime-header">
+            <span className="bonus-ultime-crown">👑</span>
+            <div className="bonus-ultime-title">BONUS ULTIME</div>
+            <div className="bonus-ultime-divider" />
+            <div className="bonus-ultime-sub">
+              Accès exclusif aux outils secrets qui font tourner le système en automatique
             </div>
-          ))}
+          </div>
+
+          {/* Cartes */}
+          <div className="bonus-ultime-grid">
+            {modulesUltime.map((m) => (
+              <div className="module-card bonus-ultime-card" key={m.num + m.title}>
+                <div
+                  className="module-thumb"
+                  onClick={() => setLightboxIdx(flatIdx(m))}
+                  style={{ cursor: "zoom-in" }}
+                >
+                  <img
+                    src={m.img}
+                    alt={m.title}
+                    loading="lazy"
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                  <div className="play-btn" />
+                  {m.badge && (
+                    <span style={{
+                      position: "absolute", top: 8, right: 8,
+                      background: "linear-gradient(135deg,#d97706,#fbbf24)",
+                      color: "#1a0d00", fontSize: 10, fontWeight: 800,
+                      padding: "3px 8px", borderRadius: 4, letterSpacing: 0.5,
+                    }}>{m.badge}</span>
+                  )}
+                </div>
+                <div className="module-info" style={{
+                  background: "linear-gradient(180deg, rgba(251,191,36,0.06), transparent)"
+                }}>
+                  <div className="module-num" style={{ color: "#fbbf24" }}>{m.num}</div>
+                  <div className="module-title" style={{ color: "#fff8dc" }}>{m.title}</div>
+                  <div className="prog-wrap">
+                    <div className="prog-bar-bg">
+                      <div className="prog-bar-fill" style={{
+                        width: `${m.pct}%`,
+                        background: "linear-gradient(90deg,#d97706,#fbbf24)"
+                      }} />
+                    </div>
+                    <span className="prog-pct" style={{ color: "#fbbf24" }}>{m.pct}%</span>
+                  </div>
+                </div>
+                <div className="bonus-ultime-card-glow" aria-hidden="true" />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
