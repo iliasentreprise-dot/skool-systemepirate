@@ -17,6 +17,12 @@ import moduleJ12 from "@/assets/module-j1-2.png";
 import moduleJ13 from "@/assets/module-j1-3.png";
 import moduleJ21 from "@/assets/module-j2-1.png";
 import moduleJ22 from "@/assets/module-j2-2.png";
+import moduleJ23 from "@/assets/module-j2-3.png";
+import moduleJ31 from "@/assets/module-j3-1.png";
+import moduleJ32 from "@/assets/module-j3-2.png";
+import moduleJ33 from "@/assets/module-j3-3.png";
+import moduleBonus1 from "@/assets/module-bonus-1.png";
+import moduleBonus2 from "@/assets/module-bonus-2.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -223,20 +229,20 @@ const modulesJour1: ModuleItem[] = [
 const modulesJour2: ModuleItem[] = [
   { num: "Jour 2 · 1", title: "Le Tunnel de vente Pirate", pct: 0, img: moduleJ21 },
   { num: "Jour 2 · 2", title: "Créer ton produit digital", pct: 0, img: moduleJ22 },
-  { num: "Jour 2 · 3", title: "Stratégie Carrousels PIRATE", pct: 0, img: module6 },
+  { num: "Jour 2 · 3", title: "Stratégie Carrousels PIRATE", pct: 0, img: moduleJ23 },
 ];
 
 // JOUR 3 — Vente & Lancement
 const modulesJour3: ModuleItem[] = [
-  { num: "Jour 3 · 1", title: "Les Lives TikTok", pct: 0, img: module7 },
-  { num: "Jour 3 · 2", title: "Closer en DM avec une méthode interdite", pct: 0, img: module2, badge: "NEW", badgeColor: "#ef4444" },
-  { num: "Jour 3 · 3", title: "🧲 LeadMagnet ULTIME", pct: 0, img: module3, badge: "NEW", badgeColor: "#ef4444" },
+  { num: "Jour 3 · 1", title: "Les Lives TikTok", pct: 0, img: moduleJ31 },
+  { num: "Jour 3 · 2", title: "Closer en DM avec une méthode interdite", pct: 0, img: moduleJ32, badge: "NEW", badgeColor: "#ef4444" },
+  { num: "Jour 3 · 3", title: "🧲 LeadMagnet ULTIME", pct: 0, img: moduleJ33, badge: "NEW", badgeColor: "#ef4444" },
 ];
 
 // MODULES BONUS
 const modulesBonus: ModuleItem[] = [
-  { num: "🎁 BONUS · 1", title: "La puissance de l'emailing", pct: 0, img: module5, badge: "NEW", badgeColor: "#f59e0b" },
-  { num: "🎁 BONUS · 2", title: "Comment déclarer", pct: 0, img: module6 },
+  { num: "🎁 BONUS · 1", title: "La puissance de l'emailing", pct: 0, img: moduleBonus1, badge: "NEW", badgeColor: "#f59e0b" },
+  { num: "🎁 BONUS · 2", title: "Comment déclarer", pct: 0, img: moduleBonus2 },
 ];
 
 // BONUS ULTIME (2 cartes)
