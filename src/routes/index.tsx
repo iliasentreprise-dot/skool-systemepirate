@@ -11,6 +11,12 @@ import module4 from "@/assets/module-4.png";
 import module5 from "@/assets/module-5.png";
 import module6 from "@/assets/module-6.png";
 import module7 from "@/assets/module-7.png";
+import moduleMindsetImg from "@/assets/module-mindset.png";
+import moduleJ11 from "@/assets/module-j1-1.png";
+import moduleJ12 from "@/assets/module-j1-2.png";
+import moduleJ13 from "@/assets/module-j1-3.png";
+import moduleJ21 from "@/assets/module-j2-1.png";
+import moduleJ22 from "@/assets/module-j2-2.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -203,20 +209,20 @@ const moduleMindset: ModuleItem = {
   num: "🧠 MODULE INTRO",
   title: "La mentalité d'un entrepreneur à +20k/mois",
   pct: 0,
-  img: module1,
+  img: moduleMindsetImg,
 };
 
 // JOUR 1 — Fondations & Setup
 const modulesJour1: ModuleItem[] = [
-  { num: "Jour 1 · 1", title: "Préparer son compte TikTok", pct: 0, img: module2, badge: "NEW", badgeColor: "#a855f7" },
-  { num: "Jour 1 · 2", title: "L'Offre Irrésistible", pct: 0, img: module3 },
-  { num: "Jour 1 · 3", title: "Analyser sa concurrence et faire mieux", pct: 0, img: module4 },
+  { num: "Jour 1 · 1", title: "Préparer son compte TikTok", pct: 0, img: moduleJ11, badge: "NEW", badgeColor: "#a855f7" },
+  { num: "Jour 1 · 2", title: "L'Offre Irrésistible", pct: 0, img: moduleJ12 },
+  { num: "Jour 1 · 3", title: "Analyser sa concurrence et faire mieux", pct: 0, img: moduleJ13 },
 ];
 
 // JOUR 2 — Construction
 const modulesJour2: ModuleItem[] = [
-  { num: "Jour 2 · 1", title: "Le Tunnel de vente Pirate", pct: 0, img: module5 },
-  { num: "Jour 2 · 2", title: "Créer ton produit digital", pct: 0, img: module4 },
+  { num: "Jour 2 · 1", title: "Le Tunnel de vente Pirate", pct: 0, img: moduleJ21 },
+  { num: "Jour 2 · 2", title: "Créer ton produit digital", pct: 0, img: moduleJ22 },
   { num: "Jour 2 · 3", title: "Stratégie Carrousels PIRATE", pct: 0, img: module6 },
 ];
 
