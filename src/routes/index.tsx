@@ -23,6 +23,8 @@ import moduleJ32 from "@/assets/module-j3-2.png";
 import moduleJ33 from "@/assets/module-j3-3.png";
 import moduleBonus1 from "@/assets/module-bonus-1.png";
 import moduleBonus2 from "@/assets/module-bonus-2.png";
+import moduleUltime1 from "@/assets/module-ultime-1.png";
+import moduleUltime2 from "@/assets/module-ultime-2.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -247,8 +249,8 @@ const modulesBonus: ModuleItem[] = [
 
 // BONUS ULTIME (2 cartes)
 const modulesUltime: ModuleItem[] = [
-  { num: "⚡ MODULE SECRET", title: "L'OUTIL d'automatisation TikTok SECRET", pct: 0, img: module7, badge: "EXCLUSIF", badgeColor: "#f59e0b" },
-  { num: "🚀 MODULE EXCLUSIF", title: "Logiciel de BOOST d'abonnés ULTIME", pct: 0, img: module1, badge: "EXCLUSIF", badgeColor: "#f59e0b" },
+  { num: "⚡ MODULE SECRET", title: "L'OUTIL d'automatisation TikTok SECRET", pct: 0, img: moduleUltime1, badge: "EXCLUSIF", badgeColor: "#f59e0b" },
+  { num: "🚀 MODULE EXCLUSIF", title: "Logiciel de BOOST d'abonnés ULTIME", pct: 0, img: moduleUltime2, badge: "EXCLUSIF", badgeColor: "#f59e0b" },
 ];
 
 // All modules flat for lightbox navigation
