@@ -201,7 +201,7 @@ type ModuleItem = {
 // MODULE INTRO MINDSET
 const moduleMindset: ModuleItem = {
   num: "🧠 MODULE INTRO",
-  title: "LE MINDSET DU GAGNANT",
+  title: "La mentalité d'un entrepreneur à +20k/mois",
   pct: 0,
   img: module1,
 };
@@ -210,13 +210,14 @@ const moduleMindset: ModuleItem = {
 const modulesJour1: ModuleItem[] = [
   { num: "Jour 1 · 1", title: "Préparer son compte TikTok", pct: 0, img: module2, badge: "NEW", badgeColor: "#a855f7" },
   { num: "Jour 1 · 2", title: "L'Offre Irrésistible", pct: 0, img: module3 },
-  { num: "Jour 1 · 3", title: "Créer ton produit digital", pct: 0, img: module4 },
+  { num: "Jour 1 · 3", title: "Analyser sa concurrence et faire mieux", pct: 0, img: module4 },
 ];
 
 // JOUR 2 — Construction
 const modulesJour2: ModuleItem[] = [
   { num: "Jour 2 · 1", title: "Le Tunnel de vente Pirate", pct: 0, img: module5 },
-  { num: "Jour 2 · 2", title: "Stratégie Carrousels PIRATE", pct: 0, img: module6 },
+  { num: "Jour 2 · 2", title: "Créer ton produit digital", pct: 0, img: module4 },
+  { num: "Jour 2 · 3", title: "Stratégie Carrousels PIRATE", pct: 0, img: module6 },
 ];
 
 // JOUR 3 — Vente & Lancement
