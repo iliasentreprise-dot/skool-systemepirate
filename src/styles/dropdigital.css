@@ -643,22 +643,69 @@
 }
 
 .dd-root .bonus-ultime-card {
-  background: linear-gradient(160deg, rgba(40,24,0,0.95) 0%, rgba(20,12,0,0.98) 100%) !important;
-  border: 1.5px solid rgba(251,191,36,0.4) !important;
-  border-radius: 14px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(251,191,36,0.25) 0%, transparent 60%),
+    linear-gradient(160deg, #3a2400 0%, #1a0f00 55%, #2a1a00 100%) !important;
+  border: 2px solid transparent !important;
+  border-radius: 16px;
   position: relative;
   overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
   cursor: pointer;
+  background-clip: padding-box;
+  box-shadow:
+    0 0 0 2px rgba(251,191,36,0.55),
+    0 0 24px rgba(251,191,36,0.35),
+    0 0 60px rgba(217,119,6,0.25),
+    inset 0 0 30px rgba(251,191,36,0.08),
+    0 12px 36px rgba(0,0,0,0.55);
+}
+
+.dd-root .bonus-ultime-card::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 16px;
+  padding: 2px;
+  background: linear-gradient(135deg, #fde68a, #f59e0b, #fffbeb, #d97706, #fbbf24, #f59e0b);
+  background-size: 300% 300%;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+  z-index: 5;
+  animation: dd-gold-border-flow 4s ease-in-out infinite;
+}
+
+@keyframes dd-gold-border-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
 }
 
 .dd-root .bonus-ultime-card:hover {
-  transform: translateY(-4px) scale(1.01);
-  border-color: rgba(251,191,36,0.9) !important;
+  transform: translateY(-6px) scale(1.02);
   box-shadow:
-    0 0 0 1px rgba(251,191,36,0.3),
-    0 0 30px rgba(251,191,36,0.2),
-    0 16px 40px rgba(0,0,0,0.5);
+    0 0 0 2px rgba(255,224,130,0.9),
+    0 0 40px rgba(251,191,36,0.6),
+    0 0 90px rgba(217,119,6,0.45),
+    inset 0 0 40px rgba(251,191,36,0.18),
+    0 20px 50px rgba(0,0,0,0.6);
+}
+
+.dd-root .bonus-ultime-card .module-num {
+  color: #fde68a !important;
+  text-shadow: 0 0 12px rgba(251,191,36,0.6);
+  letter-spacing: 0.8px;
+}
+
+.dd-root .bonus-ultime-card .module-title {
+  background: linear-gradient(90deg, #fef3c7, #fbbf24, #fde68a, #fbbf24, #fef3c7);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: dd-gold-flow 3s ease-in-out infinite;
+  font-weight: 800;
 }
 
 .dd-root .bonus-ultime-card-glow {
@@ -667,18 +714,18 @@
   background: linear-gradient(
     110deg,
     transparent 0%,
-    transparent 35%,
-    rgba(251,191,36,0.07) 48%,
-    rgba(255,248,200,0.12) 50%,
-    rgba(251,191,36,0.07) 52%,
-    transparent 65%,
+    transparent 30%,
+    rgba(255,248,200,0.18) 48%,
+    rgba(255,255,255,0.35) 50%,
+    rgba(255,248,200,0.18) 52%,
+    transparent 70%,
     transparent 100%
   );
   background-size: 300% 100%;
-  animation: dd-card-sweep 2.8s ease-in-out infinite;
+  animation: dd-card-sweep 2.6s ease-in-out infinite;
   pointer-events: none;
   z-index: 3;
-  border-radius: 14px;
+  border-radius: 16px;
 }
 
 @keyframes dd-card-sweep {
@@ -689,15 +736,16 @@
 .dd-root .bonus-ultime-card::before {
   content: '✦';
   position: absolute;
-  top: 10px; right: 12px;
-  font-size: 14px;
-  color: #fbbf24;
-  z-index: 4;
+  top: 10px; left: 12px;
+  font-size: 16px;
+  color: #fef3c7;
+  z-index: 6;
+  text-shadow: 0 0 10px rgba(251,191,36,0.9);
   animation: dd-star-pulse 2s ease-in-out infinite;
 }
 
 @keyframes dd-star-pulse {
-  0%, 100% { opacity: 0.4; transform: scale(0.8) rotate(0deg); }
+  0%, 100% { opacity: 0.5; transform: scale(0.85) rotate(0deg); }
   50%       { opacity: 1;   transform: scale(1.3) rotate(180deg); }
 }
 
