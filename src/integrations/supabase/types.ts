@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      chapters: {
+        Row: {
+          id: string
+          module_id: string
+          title: string
+          description: string
+          video_url: string
+          duration_seconds: number
+          position: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          module_id: string
+          title: string
+          description?: string
+          video_url?: string
+          duration_seconds?: number
+          position?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          module_id?: string
+          title?: string
+          description?: string
+          video_url?: string
+          duration_seconds?: number
+          position?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chapters_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comments: {
         Row: {
           body: string
@@ -108,6 +152,71 @@ export type Database = {
           username_changed?: boolean
         }
         Relationships: []
+      }
+      modules: {
+        Row: {
+          id: string
+          title: string
+          description: string
+          section: string
+          position: number
+          thumbnail_url: string | null
+          badge: string | null
+          badge_color: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          description?: string
+          section?: string
+          position?: number
+          thumbnail_url?: string | null
+          badge?: string | null
+          badge_color?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          description?: string
+          section?: string
+          position?: number
+          thumbnail_url?: string | null
+          badge?: string | null
+          badge_color?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_chapter_progress: {
+        Row: {
+          user_id: string
+          chapter_id: string
+          completed_at: string
+        }
+        Insert: {
+          user_id: string
+          chapter_id: string
+          completed_at?: string
+        }
+        Update: {
+          user_id?: string
+          chapter_id?: string
+          completed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_chapter_progress_chapter_id_fkey"
+            columns: ["chapter_id"]
+            isOneToOne: false
+            referencedRelation: "chapters"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

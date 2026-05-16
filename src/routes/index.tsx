@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
@@ -151,6 +151,20 @@ function TabBtn({
 }
 
 function Sidebar({ tab, setTab, open }: { tab: TabKey; setTab: (t: TabKey) => void; open: boolean }) {
+  const { user } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle()
+      .then(({ data }) => setIsAdmin(!!data));
+  }, [user]);
+
   const item = (key: TabKey, icon: string, label: string, prog?: string) => (
     <div
       className={`sidebar-item ${tab === key ? "active" : ""}`}
@@ -163,7 +177,7 @@ function Sidebar({ tab, setTab, open }: { tab: TabKey; setTab: (t: TabKey) => vo
   return (
     <div className={`sidebar ${open ? "" : "closed"}`}>
       <div className="sidebar-title">Ma Formation</div>
-      {item("modules", "📚", "Modules", "6")}
+      {item("modules", "📚", "Modules")}
       {item("groupe", "🏴", "Groupe Privé")}
       {item("coaching", "🎯", "Coaching")}
       {item("resultats", "🏆", "Résultats Élèves")}
@@ -175,9 +189,6 @@ function Sidebar({ tab, setTab, open }: { tab: TabKey; setTab: (t: TabKey) => vo
         style={{ cursor: "pointer" }}
       >
         <span>👤</span> Profil
-      </div>
-      <div className="sidebar-item">
-        <span>📊</span> Progression <span className="si-prog">0%</span>
       </div>
       <div
         className={`sidebar-item ${tab === "parametres" ? "active" : ""}`}
@@ -192,6 +203,11 @@ function Sidebar({ tab, setTab, open }: { tab: TabKey; setTab: (t: TabKey) => vo
         </span>
         Paramètres
       </div>
+      {isAdmin && (
+        <Link to="/admin" className="sidebar-item" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 8 }}>
+          <span>⚙️</span> Admin
+        </Link>
+      )}
       <div className="sidebar-item" onClick={() => { void supabase.auth.signOut().then(() => window.location.assign("/login")); }} style={{ cursor: "pointer" }}>
         <span>🚪</span> Déconnexion
       </div>
@@ -264,12 +280,106 @@ const allModules: ModuleItem[] = [
 ];
 
 // ============================================================
-// MODULES TAB
+// MODULES TAB — DB-driven with player links
 // ============================================================
 
+type DbModule = {
+  id: string;
+  title: string;
+  description: string;
+  section: string;
+  position: number;
+  thumbnail_url: string | null;
+  badge: string | null;
+  badge_color: string | null;
+  firstChapterId?: string | null;
+  totalChapters?: number;
+  completedChapters?: number;
+};
+
+const SECTION_META: Record<string, { badge: string; color: string; title: string; sub: string }> = {
+  mindset: { badge: "🧠 COMMENCER ICI", color: "linear-gradient(135deg,#4c1d95,#7c3aed)", title: "LE MINDSET DU GAGNANT", sub: "Présentation du système PIRATE · Mindset · Motivation" },
+  jour1:   { badge: "JOUR 1", color: "linear-gradient(135deg,#7c3aed,#a855f7)", title: "Fondations & Setup", sub: "Prépare ton compte · Crée ton offre · Lance ton produit" },
+  jour2:   { badge: "JOUR 2", color: "linear-gradient(135deg,#0891b2,#06b6d4)", title: "Construction", sub: "Tunnel de vente · Stratégie Carrousels · Automatisation" },
+  jour3:   { badge: "JOUR 3", color: "linear-gradient(135deg,#059669,#10b981)", title: "Vente & Lancement", sub: "Lives TikTok · Closer en DM · LeadMagnet · Retargeting" },
+  bonus:   { badge: "🎁 MODULES BONUS", color: "linear-gradient(135deg,#d97706,#f59e0b)", title: "Bonus", sub: "Optimisation · Emailing · Déclaration" },
+  ultime:  { badge: "⚡ BONUS ULTIME", color: "linear-gradient(135deg,#d97706,#fbbf24)", title: "Bonus Ultime", sub: "Accès exclusif aux outils secrets" },
+  general: { badge: "📚 MODULE", color: "linear-gradient(135deg,#7c3aed,#a855f7)", title: "Formation", sub: "" },
+};
+
 function ModulesTab() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [dbModules, setDbModules] = useState<DbModule[]>([]);
+  const [globalPct, setGlobalPct] = useState(0);
+  const [dbLoaded, setDbLoaded] = useState(false);
+
+  // Fallback: show static lightbox when DB has no modules
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data: mods } = await supabase
+        .from("modules")
+        .select("*")
+        .order("section")
+        .order("position");
+
+      if (!mods || mods.length === 0) {
+        setDbLoaded(true);
+        return;
+      }
+
+      // Load first chapter id per module + chapter counts
+      const modIds = mods.map((m) => m.id);
+      const { data: chaptersAll } = await supabase
+        .from("chapters")
+        .select("id, module_id, position")
+        .in("module_id", modIds)
+        .order("position");
+
+      const allChapterIds = (chaptersAll || []).map((c) => c.id);
+
+      let completedSet = new Set<string>();
+      if (allChapterIds.length > 0) {
+        const { data: progress } = await supabase
+          .from("user_chapter_progress")
+          .select("chapter_id")
+          .eq("user_id", user.id)
+          .in("chapter_id", allChapterIds);
+        completedSet = new Set((progress || []).map((p) => p.chapter_id));
+      }
+
+      // Group chapters by module
+      const chapsByModule: Record<string, typeof chaptersAll> = {};
+      for (const c of chaptersAll || []) {
+        if (!chapsByModule[c.module_id]) chapsByModule[c.module_id] = [];
+        chapsByModule[c.module_id]!.push(c);
+      }
+
+      const enriched: DbModule[] = (mods as DbModule[]).map((m) => {
+        const mChaps = chapsByModule[m.id] || [];
+        const sorted = [...mChaps].sort((a, b) => a.position - b.position);
+        const completed = mChaps.filter((c) => completedSet.has(c.id)).length;
+        return {
+          ...m,
+          firstChapterId: sorted[0]?.id ?? null,
+          totalChapters: mChaps.length,
+          completedChapters: completed,
+        };
+      });
+
+      setDbModules(enriched);
+
+      const totalC = allChapterIds.length;
+      const doneC = completedSet.size;
+      setGlobalPct(totalC > 0 ? Math.round((doneC / totalC) * 100) : 0);
+      setDbLoaded(true);
+    })();
+  }, [user]);
+
+  // Static lightbox (fallback when DB is empty)
   useEffect(() => {
     if (lightboxIdx === null) return;
     const onKey = (e: KeyboardEvent) => {
@@ -286,31 +396,69 @@ function ModulesTab() {
   }, [lightboxIdx]);
 
   const current = lightboxIdx !== null ? allModules[lightboxIdx] : null;
-
-  // Helper to get flat index for a module
   const flatIdx = (m: ModuleItem) => allModules.findIndex((x) => x === m);
 
+  // ── DB card ──
+  const renderDbCard = (m: DbModule) => {
+    const pct = m.totalChapters ? Math.round(((m.completedChapters || 0) / m.totalChapters) * 100) : 0;
+    const hasChapters = (m.totalChapters || 0) > 0;
+    return (
+      <div className="module-card" key={m.id}>
+        <div
+          className="module-thumb"
+          style={{ cursor: hasChapters ? "pointer" : "default" }}
+          onClick={() => {
+            if (hasChapters && m.firstChapterId)
+              navigate({ to: "/player/$chapterId", params: { chapterId: m.firstChapterId } });
+          }}
+        >
+          {m.thumbnail_url ? (
+            <img src={m.thumbnail_url} alt={m.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          ) : (
+            <div style={{ width: "100%", height: "100%", background: "rgba(124,58,237,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36 }}>📹</div>
+          )}
+          {hasChapters && <div className="play-btn" />}
+          {m.badge && (
+            <span style={{ position: "absolute", top: 8, right: 8, background: m.badge_color || "#a855f7", color: "#fff", fontSize: 10, fontWeight: 800, padding: "3px 8px", borderRadius: 4, letterSpacing: 0.5 }}>
+              {m.badge}
+            </span>
+          )}
+          {!hasChapters && (
+            <span style={{ position: "absolute", bottom: 8, left: 8, background: "rgba(0,0,0,0.6)", color: "#9a7dbd", fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 4 }}>
+              Bientôt disponible
+            </span>
+          )}
+        </div>
+        <div className="module-info">
+          <div className="module-title">{m.title}</div>
+          {m.description && <div style={{ fontSize: 12, color: "#7c5c9a", marginBottom: 8, lineHeight: 1.4 }}>{m.description}</div>}
+          <div className="prog-wrap">
+            <div className="prog-bar-bg">
+              <div className="prog-bar-fill" style={{ width: `${pct}%` }} />
+            </div>
+            <span className="prog-pct">{pct}%</span>
+          </div>
+          {hasChapters && m.firstChapterId && (
+            <button
+              onClick={() => navigate({ to: "/player/$chapterId", params: { chapterId: m.firstChapterId! } })}
+              style={{ marginTop: 10, width: "100%", padding: "8px 0", background: "linear-gradient(135deg,#7c3aed,#a855f7)", border: "none", borderRadius: 8, color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+            >
+              ▶ Regarder
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // ── Static card (fallback) ──
   const renderCard = (m: ModuleItem, idx: number) => (
     <div className="module-card" key={m.num + m.title}>
-      <div
-        className="module-thumb"
-        onClick={() => setLightboxIdx(idx)}
-        style={{ cursor: "zoom-in" }}
-      >
-        <img
-          src={m.img}
-          alt={m.title}
-          loading="lazy"
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-        />
+      <div className="module-thumb" onClick={() => setLightboxIdx(idx)} style={{ cursor: "zoom-in" }}>
+        <img src={m.img} alt={m.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         <div className="play-btn" />
         {m.badge && (
-          <span style={{
-            position: "absolute", top: 8, right: 8,
-            background: m.badgeColor || "#a855f7",
-            color: "#fff", fontSize: 10, fontWeight: 800,
-            padding: "3px 8px", borderRadius: 4, letterSpacing: 0.5,
-          }}>{m.badge}</span>
+          <span style={{ position: "absolute", top: 8, right: 8, background: m.badgeColor || "#a855f7", color: "#fff", fontSize: 10, fontWeight: 800, padding: "3px 8px", borderRadius: 4, letterSpacing: 0.5 }}>{m.badge}</span>
         )}
       </div>
       <div className="module-info">
@@ -326,6 +474,54 @@ function ModulesTab() {
     </div>
   );
 
+  // Group DB modules by section
+  const sections = Array.from(new Set(dbModules.map((m) => m.section)));
+
+  // ── DB mode ──
+  if (dbLoaded && dbModules.length > 0) {
+    return (
+      <div className="tab-content active">
+        <div className="section-header">
+          <h1>🏴 Système Pirate — Ma Formation</h1>
+          <p>Vendre des produits digitaux sur TikTok en automatique · Sans visage · Sans audience · Sans montage</p>
+        </div>
+        <div className="progress-global">
+          <span className="pg-label">Progression globale</span>
+          <div className="pg-bar-wrap">
+            <div className="pg-bar" style={{ width: `${globalPct}%` }} />
+          </div>
+          <span className="pg-pct">{globalPct}%</span>
+        </div>
+
+        {sections.map((sec) => {
+          const meta = SECTION_META[sec] || SECTION_META.general;
+          const secMods = dbModules.filter((m) => m.section === sec);
+          const secTotal = secMods.reduce((a, m) => a + (m.totalChapters || 0), 0);
+          const secDone = secMods.reduce((a, m) => a + (m.completedChapters || 0), 0);
+          const secPct = secTotal > 0 ? Math.round((secDone / secTotal) * 100) : 0;
+          return (
+            <div className="day-section" key={sec}>
+              <div className="day-header">
+                <div className="day-badge" style={{ background: meta.color }}>{meta.badge}</div>
+                <div className="day-title">{meta.title}</div>
+                {meta.sub && <div className="day-sub">{meta.sub}</div>}
+                {secTotal > 0 && (
+                  <div className="day-progress-bar">
+                    <div className="day-progress-fill" style={{ width: `${secPct}%` }} />
+                  </div>
+                )}
+              </div>
+              <div className={`modules-grid${secMods.length === 1 ? " modules-grid-1" : ""}`}>
+                {secMods.map((m) => renderDbCard(m))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // ── Static fallback (DB empty) ──
   return (
     <div className="tab-content active">
       <div className="section-header">
@@ -341,7 +537,7 @@ function ModulesTab() {
         <span className="pg-pct">0%</span>
       </div>
 
-      {/* ===== MODULE INTRO MINDSET ===== */}
+      {/* MODULE INTRO MINDSET */}
       <div className="day-section mindset-section">
         <div className="day-header mindset-header">
           <div className="day-badge mindset-badge">🧠 COMMENCER ICI</div>
@@ -353,123 +549,76 @@ function ModulesTab() {
         </div>
       </div>
 
-      {/* ===== JOUR 1 ===== */}
+      {/* JOUR 1 */}
       <div className="day-section">
         <div className="day-header">
           <div className="day-badge" style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7)" }}>JOUR 1</div>
           <div className="day-title">Fondations & Setup</div>
           <div className="day-sub">Prépare ton compte · Crée ton offre · Lance ton produit</div>
-          <div className="day-progress-bar">
-            <div className="day-progress-fill" style={{ width: "0%" }} />
-          </div>
+          <div className="day-progress-bar"><div className="day-progress-fill" style={{ width: "0%" }} /></div>
         </div>
-        <div className="modules-grid">
-          {modulesJour1.map((m) => renderCard(m, flatIdx(m)))}
-        </div>
+        <div className="modules-grid">{modulesJour1.map((m) => renderCard(m, flatIdx(m)))}</div>
       </div>
 
-      {/* ===== JOUR 2 ===== */}
+      {/* JOUR 2 */}
       <div className="day-section">
         <div className="day-header">
           <div className="day-badge" style={{ background: "linear-gradient(135deg,#0891b2,#06b6d4)" }}>JOUR 2</div>
           <div className="day-title">Construction</div>
           <div className="day-sub">Tunnel de vente · Stratégie Carrousels · Automatisation</div>
-          <div className="day-progress-bar">
-            <div className="day-progress-fill" style={{ width: "0%", background: "linear-gradient(90deg,#0891b2,#06b6d4)" }} />
-          </div>
+          <div className="day-progress-bar"><div className="day-progress-fill" style={{ width: "0%", background: "linear-gradient(90deg,#0891b2,#06b6d4)" }} /></div>
         </div>
-        <div className="modules-grid">
-          {modulesJour2.map((m) => renderCard(m, flatIdx(m)))}
-        </div>
+        <div className="modules-grid">{modulesJour2.map((m) => renderCard(m, flatIdx(m)))}</div>
       </div>
 
-      {/* ===== JOUR 3 ===== */}
+      {/* JOUR 3 */}
       <div className="day-section">
         <div className="day-header">
           <div className="day-badge" style={{ background: "linear-gradient(135deg,#059669,#10b981)" }}>JOUR 3</div>
           <div className="day-title">Vente & Lancement</div>
           <div className="day-sub">Lives TikTok · Closer en DM · LeadMagnet · Retargeting</div>
-          <div className="day-progress-bar">
-            <div className="day-progress-fill" style={{ width: "0%", background: "linear-gradient(90deg,#059669,#10b981)" }} />
-          </div>
+          <div className="day-progress-bar"><div className="day-progress-fill" style={{ width: "0%", background: "linear-gradient(90deg,#059669,#10b981)" }} /></div>
         </div>
-        <div className="modules-grid">
-          {modulesJour3.map((m) => renderCard(m, flatIdx(m)))}
-        </div>
+        <div className="modules-grid">{modulesJour3.map((m) => renderCard(m, flatIdx(m)))}</div>
       </div>
 
-      {/* ===== MODULES BONUS ===== */}
+      {/* BONUS */}
       <div className="day-section">
         <div className="day-header">
           <div className="day-badge" style={{ background: "linear-gradient(135deg,#d97706,#f59e0b)" }}>🎁 MODULES BONUS</div>
           <div className="day-title">Bonus</div>
           <div className="day-sub">Optimisation · Emailing · Déclaration</div>
         </div>
-        <div className="modules-grid">
-          {modulesBonus.map((m) => renderCard(m, flatIdx(m)))}
-        </div>
+        <div className="modules-grid">{modulesBonus.map((m) => renderCard(m, flatIdx(m)))}</div>
       </div>
 
-      {/* ===== BONUS ULTIME ===== */}
+      {/* BONUS ULTIME */}
       <div className="bonus-ultime-section">
         <div className="bonus-ultime-wrapper">
-          {/* Étoiles flottantes */}
           <div className="bonus-ultime-stars" aria-hidden="true">
-            <span>✦</span>
-            <span>✧</span>
-            <span>✦</span>
-            <span>✧</span>
-            <span>✦</span>
-            <span>✧</span>
+            <span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span><span>✧</span>
           </div>
-
-          {/* Header */}
           <div className="bonus-ultime-header">
             <span className="bonus-ultime-crown">👑</span>
             <div className="bonus-ultime-title">BONUS ULTIME</div>
             <div className="bonus-ultime-divider" />
-            <div className="bonus-ultime-sub">
-              Accès exclusif aux outils secrets qui font tourner le système en automatique
-            </div>
+            <div className="bonus-ultime-sub">Accès exclusif aux outils secrets qui font tourner le système en automatique</div>
           </div>
-
-          {/* Cartes */}
           <div className="bonus-ultime-grid">
             {modulesUltime.map((m) => (
               <div className="module-card bonus-ultime-card" key={m.num + m.title}>
-                <div
-                  className="module-thumb"
-                  onClick={() => setLightboxIdx(flatIdx(m))}
-                  style={{ cursor: "zoom-in" }}
-                >
-                  <img
-                    src={m.img}
-                    alt={m.title}
-                    loading="lazy"
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                  />
+                <div className="module-thumb" onClick={() => setLightboxIdx(flatIdx(m))} style={{ cursor: "zoom-in" }}>
+                  <img src={m.img} alt={m.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   <div className="play-btn" />
                   {m.badge && (
-                    <span style={{
-                      position: "absolute", top: 8, right: 8,
-                      background: "linear-gradient(135deg,#d97706,#fbbf24)",
-                      color: "#1a0d00", fontSize: 10, fontWeight: 800,
-                      padding: "3px 8px", borderRadius: 4, letterSpacing: 0.5,
-                    }}>{m.badge}</span>
+                    <span style={{ position: "absolute", top: 8, right: 8, background: "linear-gradient(135deg,#d97706,#fbbf24)", color: "#1a0d00", fontSize: 10, fontWeight: 800, padding: "3px 8px", borderRadius: 4, letterSpacing: 0.5 }}>{m.badge}</span>
                   )}
                 </div>
-                <div className="module-info" style={{
-                  background: "linear-gradient(180deg, rgba(251,191,36,0.06), transparent)"
-                }}>
+                <div className="module-info" style={{ background: "linear-gradient(180deg, rgba(251,191,36,0.06), transparent)" }}>
                   <div className="module-num" style={{ color: "#fbbf24" }}>{m.num}</div>
                   <div className="module-title" style={{ color: "#fff8dc" }}>{m.title}</div>
                   <div className="prog-wrap">
-                    <div className="prog-bar-bg">
-                      <div className="prog-bar-fill" style={{
-                        width: `${m.pct}%`,
-                        background: "linear-gradient(90deg,#d97706,#fbbf24)"
-                      }} />
-                    </div>
+                    <div className="prog-bar-bg"><div className="prog-bar-fill" style={{ width: `${m.pct}%`, background: "linear-gradient(90deg,#d97706,#fbbf24)" }} /></div>
                     <span className="prog-pct" style={{ color: "#fbbf24" }}>{m.pct}%</span>
                   </div>
                 </div>
@@ -480,7 +629,7 @@ function ModulesTab() {
         </div>
       </div>
 
-      {/* ===== CTA ===== */}
+      {/* CTA */}
       <div className="cta-section">
         <div className="cta-text">
           <h2>🏴 Offre Live — Disparaît à la fin du live</h2>
@@ -497,16 +646,7 @@ function ModulesTab() {
       {/* LIGHTBOX */}
       {current && lightboxIdx !== null && (
         <div className="lightbox-overlay" onClick={() => setLightboxIdx(null)}>
-          <button
-            className="lightbox-nav lightbox-prev"
-            onClick={(e) => {
-              e.stopPropagation();
-              setLightboxIdx((i) => (i === null ? i : (i - 1 + allModules.length) % allModules.length));
-            }}
-            aria-label="Précédent"
-          >
-            ‹
-          </button>
+          <button className="lightbox-nav lightbox-prev" onClick={(e) => { e.stopPropagation(); setLightboxIdx((i) => (i === null ? i : (i - 1 + allModules.length) % allModules.length)); }} aria-label="Précédent">‹</button>
           <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
             <img src={current.img} alt={current.title} className="lightbox-img" />
             <div className="lightbox-caption">
@@ -514,31 +654,12 @@ function ModulesTab() {
               <div className="lightbox-title">{current.title}</div>
             </div>
             <button className="lightbox-watch" onClick={(e) => e.stopPropagation()}>
-              <span className="lightbox-watch-play" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </span>
+              <span className="lightbox-watch-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg></span>
               Regarder
             </button>
           </div>
-          <button
-            className="lightbox-nav lightbox-next"
-            onClick={(e) => {
-              e.stopPropagation();
-              setLightboxIdx((i) => (i === null ? i : (i + 1) % allModules.length));
-            }}
-            aria-label="Suivant"
-          >
-            ›
-          </button>
-          <button
-            className="lightbox-close"
-            onClick={() => setLightboxIdx(null)}
-            aria-label="Fermer"
-          >
-            ✕
-          </button>
+          <button className="lightbox-nav lightbox-next" onClick={(e) => { e.stopPropagation(); setLightboxIdx((i) => (i === null ? i : (i + 1) % allModules.length)); }} aria-label="Suivant">›</button>
+          <button className="lightbox-close" onClick={() => setLightboxIdx(null)} aria-label="Fermer">✕</button>
         </div>
       )}
     </div>
