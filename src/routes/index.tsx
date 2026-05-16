@@ -269,6 +269,16 @@ const modulesUltime: ModuleItem[] = [
   { num: "🚀 MODULE EXCLUSIF", title: "Logiciel de BOOST d'abonnés ULTIME", pct: 0, img: moduleUltime2, badge: "EXCLUSIF", badgeColor: "#f59e0b" },
 ];
 
+// Static image mapping keyed by section → ordered by position
+const STATIC_IMAGES: Record<string, string[]> = {
+  mindset: [moduleMindsetImg],
+  jour1: [moduleJ11, moduleJ12, moduleJ13],
+  jour2: [moduleJ21, moduleJ22, moduleJ23],
+  jour3: [moduleJ31, moduleJ32, moduleJ33],
+  bonus: [moduleBonus1, moduleBonus2],
+  ultime: [moduleUltime1, moduleUltime2],
+};
+
 // All modules flat for lightbox navigation
 const allModules: ModuleItem[] = [
   moduleMindset,
@@ -401,31 +411,25 @@ function ModulesTab() {
   // ── DB card ──
   const renderDbCard = (m: DbModule) => {
     const pct = m.totalChapters ? Math.round(((m.completedChapters || 0) / m.totalChapters) * 100) : 0;
-    const hasChapters = (m.totalChapters || 0) > 0;
+    const thumb = m.thumbnail_url || STATIC_IMAGES[m.section]?.[m.position];
+    const goToModule = () =>
+      navigate({ to: "/module/$moduleId", params: { moduleId: m.id } });
     return (
       <div className="module-card" key={m.id}>
         <div
           className="module-thumb"
-          style={{ cursor: hasChapters ? "pointer" : "default" }}
-          onClick={() => {
-            if (hasChapters && m.firstChapterId)
-              navigate({ to: "/player/$chapterId", params: { chapterId: m.firstChapterId } });
-          }}
+          style={{ cursor: "pointer" }}
+          onClick={goToModule}
         >
-          {m.thumbnail_url ? (
-            <img src={m.thumbnail_url} alt={m.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          {thumb ? (
+            <img src={thumb} alt={m.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           ) : (
             <div style={{ width: "100%", height: "100%", background: "rgba(124,58,237,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36 }}>📹</div>
           )}
-          {hasChapters && <div className="play-btn" />}
+          <div className="play-btn" />
           {m.badge && (
             <span style={{ position: "absolute", top: 8, right: 8, background: m.badge_color || "#a855f7", color: "#fff", fontSize: 10, fontWeight: 800, padding: "3px 8px", borderRadius: 4, letterSpacing: 0.5 }}>
               {m.badge}
-            </span>
-          )}
-          {!hasChapters && (
-            <span style={{ position: "absolute", bottom: 8, left: 8, background: "rgba(0,0,0,0.6)", color: "#9a7dbd", fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 4 }}>
-              Bientôt disponible
             </span>
           )}
         </div>
@@ -438,14 +442,12 @@ function ModulesTab() {
             </div>
             <span className="prog-pct">{pct}%</span>
           </div>
-          {hasChapters && m.firstChapterId && (
-            <button
-              onClick={() => navigate({ to: "/player/$chapterId", params: { chapterId: m.firstChapterId! } })}
-              style={{ marginTop: 10, width: "100%", padding: "8px 0", background: "linear-gradient(135deg,#7c3aed,#a855f7)", border: "none", borderRadius: 8, color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer" }}
-            >
-              ▶ Regarder
-            </button>
-          )}
+          <button
+            onClick={goToModule}
+            style={{ marginTop: 10, width: "100%", padding: "8px 0", background: "linear-gradient(135deg,#7c3aed,#a855f7)", border: "none", borderRadius: 8, color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+          >
+            ▶ Découvrir
+          </button>
         </div>
       </div>
     );

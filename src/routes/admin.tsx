@@ -1,8 +1,136 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import "../styles/admin.css";
+
+function VideoInput({
+  moduleId,
+  value,
+  onChange,
+}: {
+  moduleId: string;
+  value: string;
+  onChange: (url: string) => void;
+}) {
+  const [dragging, setDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [showUrl, setShowUrl] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const isStorage = value.includes("supabase") || value.includes("course-videos");
+
+  const upload = async (file: File) => {
+    if (!file.type.startsWith("video/")) return;
+    setUploading(true);
+    const ext = file.name.split(".").pop() || "mp4";
+    const path = `${moduleId}/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage
+      .from("course-videos")
+      .upload(path, file, { upsert: false });
+    if (!error) {
+      const { data } = supabase.storage.from("course-videos").getPublicUrl(path);
+      onChange(data.publicUrl);
+    }
+    setUploading(false);
+  };
+
+  if (uploading) {
+    return (
+      <div className="video-input">
+        <div className="admin-dropzone uploading">
+          <div className="dz-uploading">
+            <div className="dz-spinner" />
+            Envoi en cours…
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="video-input">
+      {showUrl ? (
+        <>
+          <input
+            className="dz-url-input"
+            placeholder="https://www.youtube.com/watch?v=…"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+          />
+          <button
+            type="button"
+            className="dz-url-toggle"
+            onClick={() => setShowUrl(false)}
+          >
+            ← Retour au dropzone
+          </button>
+        </>
+      ) : (
+        <>
+          <div
+            className={[
+              "admin-dropzone",
+              dragging ? "dragging" : "",
+              isStorage ? "has-video" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            onClick={() => fileRef.current?.click()}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragging(true);
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragging(false);
+              const f = e.dataTransfer.files[0];
+              if (f) void upload(f);
+            }}
+          >
+            {isStorage ? (
+              <div className="dz-has-video">
+                <div className="dz-icon">✅</div>
+                <div className="dz-name">Vidéo uploadée</div>
+                <div className="dz-replace">Glisser pour remplacer</div>
+              </div>
+            ) : (
+              <>
+                <div className="dz-icon">🎬</div>
+                <div className="dz-label">Glisser une vidéo ici</div>
+                <div className="dz-sub">MP4 · WebM · MOV</div>
+                <button type="button" className="dz-browse">
+                  Parcourir
+                </button>
+              </>
+            )}
+            <input
+              ref={fileRef}
+              type="file"
+              accept="video/*"
+              hidden
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void upload(f);
+              }}
+            />
+          </div>
+          <button
+            type="button"
+            className="dz-url-toggle"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowUrl(true);
+            }}
+          >
+            ou coller une URL (YouTube / Vimeo)
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
@@ -539,16 +667,13 @@ function AdminPage() {
                       </label>
                     </div>
                     <label>
-                      URL vidéo (YouTube / Vimeo / embed)
-                      <input
+                      Vidéo
+                      <VideoInput
+                        moduleId={m.id}
                         value={chapterForm.video_url}
-                        onChange={(e) =>
-                          setChapterForm((f) => ({
-                            ...f,
-                            video_url: e.target.value,
-                          }))
+                        onChange={(url) =>
+                          setChapterForm((f) => ({ ...f, video_url: url }))
                         }
-                        placeholder="https://www.youtube.com/watch?v=..."
                       />
                     </label>
                     <label>

@@ -16,6 +16,7 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlayerChapterIdRouteImport } from './routes/player.$chapterId'
+import { Route as ModuleModuleIdRouteImport } from './routes/module.$moduleId'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -52,6 +53,11 @@ const PlayerChapterIdRoute = PlayerChapterIdRouteImport.update({
   path: '/player/$chapterId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ModuleModuleIdRoute = ModuleModuleIdRouteImport.update({
+  id: '/module/$moduleId',
+  path: '/module/$moduleId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/player/$chapterId': typeof PlayerChapterIdRoute
+  '/module/$moduleId': typeof ModuleModuleIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/player/$chapterId': typeof PlayerChapterIdRoute
+  '/module/$moduleId': typeof ModuleModuleIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/player/$chapterId': typeof PlayerChapterIdRoute
+  '/module/$moduleId': typeof ModuleModuleIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/player/$chapterId'
+    | '/module/$moduleId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/player/$chapterId'
+    | '/module/$moduleId'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/player/$chapterId'
+    | '/module/$moduleId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,6 +131,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
   PlayerChapterIdRoute: typeof PlayerChapterIdRoute
+  ModuleModuleIdRoute: typeof ModuleModuleIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -172,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlayerChapterIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/module/$moduleId': {
+      id: '/module/$moduleId'
+      path: '/module/$moduleId'
+      fullPath: '/module/$moduleId'
+      preLoaderRoute: typeof ModuleModuleIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -183,6 +203,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
   PlayerChapterIdRoute: PlayerChapterIdRoute,
+  ModuleModuleIdRoute: ModuleModuleIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
