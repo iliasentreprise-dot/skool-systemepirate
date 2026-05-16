@@ -58,13 +58,20 @@ function ModulePage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [dataLoading, setDataLoading] = useState(true);
 
-  // Upload state (admin only)
+  // Upload state (admin only — "bientôt disponible" drop zone)
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [newTitle, setNewTitle] = useState("");
   const [showTitleForm, setShowTitleForm] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Add chapter from sidebar (admin only)
+  const [showAddChapter, setShowAddChapter] = useState(false);
+  const [newChapterTitle, setNewChapterTitle] = useState("");
+  const [newChapterVideoUrl, setNewChapterVideoUrl] = useState("");
+  const [addingChapter, setAddingChapter] = useState(false);
+  const [addingChapterUploading, setAddingChapterUploading] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
@@ -413,26 +420,158 @@ function ModulePage() {
           <div
             className={`player-sidebar${sidebarOpen ? " open" : " closed"}`}
           >
-            <div className="player-sidebar-title">Chapitres</div>
+            {/* Sidebar header with + button for admin */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 20px 10px" }}>
+              <div className="player-sidebar-title" style={{ padding: 0 }}>Chapitres</div>
+              {isAdmin && (
+                <button
+                  onClick={() => setShowAddChapter((v) => !v)}
+                  title="Ajouter un chapitre"
+                  style={{
+                    width: 28, height: 28,
+                    background: "rgba(168,85,247,0.15)",
+                    border: "1px solid rgba(168,85,247,0.3)",
+                    borderRadius: 8, color: "#c4a3f0",
+                    fontSize: 18, fontWeight: 700, cursor: "pointer",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  {showAddChapter ? "−" : "+"}
+                </button>
+              )}
+            </div>
+
+            {/* New chapter form (admin) */}
+            {isAdmin && showAddChapter && (
+              <div style={{ margin: "0 8px 12px", background: "rgba(15,5,30,0.8)", border: "1px solid rgba(168,85,247,0.25)", borderRadius: 10, padding: 14, display: "flex", flexDirection: "column", gap: 10 }}>
+                <input
+                  placeholder="Titre du chapitre *"
+                  value={newChapterTitle}
+                  onChange={(e) => setNewChapterTitle(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") { setShowAddChapter(false); setNewChapterTitle(""); setNewChapterVideoUrl(""); }
+                  }}
+                  autoFocus
+                  style={{ background: "rgba(10,3,20,0.8)", border: "1px solid rgba(168,85,247,0.2)", borderRadius: 7, padding: "8px 10px", color: "#e2d4f8", fontSize: 13, fontFamily: "inherit", outline: "none", width: "100%", boxSizing: "border-box" }}
+                />
+
+                {/* Video upload */}
+                {!newChapterVideoUrl ? (
+                  addingChapterUploading ? (
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#10b981", fontSize: 12, padding: "8px 0" }}>
+                      <div style={{ width: 14, height: 14, border: "2px solid rgba(16,185,129,0.2)", borderTopColor: "#10b981", borderRadius: "50%", animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
+                      Envoi en cours…
+                    </div>
+                  ) : (
+                    <label style={{ border: "2px dashed rgba(168,85,247,0.25)", borderRadius: 8, padding: "12px 10px", display: "flex", flexDirection: "column", alignItems: "center", gap: 6, cursor: "pointer", background: "rgba(124,58,237,0.03)" }}>
+                      <span style={{ fontSize: 20 }}>🎬</span>
+                      <span style={{ fontSize: 11, color: "#c4a3f0", fontWeight: 600 }}>Glisser une vidéo ou cliquer</span>
+                      <span style={{ fontSize: 10, color: "#6b4fa0" }}>MP4 · WebM · MOV</span>
+                      <input
+                        type="file"
+                        accept="video/*"
+                        hidden
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          setAddingChapterUploading(true);
+                          const ext = file.name.split(".").pop() || "mp4";
+                          const path = `${moduleId}/${Date.now()}.${ext}`;
+                          const { error } = await supabase.storage.from("course-videos").upload(path, file, { upsert: false });
+                          if (!error) {
+                            const { data } = supabase.storage.from("course-videos").getPublicUrl(path);
+                            setNewChapterVideoUrl(data.publicUrl);
+                          }
+                          setAddingChapterUploading(false);
+                        }}
+                      />
+                    </label>
+                  )
+                ) : (
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 8, padding: "8px 10px" }}>
+                    <span style={{ fontSize: 16 }}>✅</span>
+                    <span style={{ fontSize: 11, color: "#10b981", fontWeight: 600, flex: 1 }}>Vidéo prête</span>
+                    <button type="button" onClick={() => setNewChapterVideoUrl("")} style={{ background: "none", border: "none", color: "#6b4fa0", fontSize: 11, cursor: "pointer", padding: 0 }}>Changer</button>
+                  </div>
+                )}
+
+                <div style={{ display: "flex", gap: 6 }}>
+                  <button
+                    onClick={async () => {
+                      if (!newChapterTitle.trim() || addingChapter) return;
+                      setAddingChapter(true);
+                      const { error } = await supabase.from("chapters").insert({
+                        module_id: moduleId,
+                        title: newChapterTitle.trim(),
+                        description: "",
+                        video_url: newChapterVideoUrl,
+                        position: chapters.length,
+                        duration_seconds: 0,
+                      });
+                      if (!error) {
+                        await reloadChapters();
+                        setNewChapterTitle("");
+                        setNewChapterVideoUrl("");
+                        setShowAddChapter(false);
+                      }
+                      setAddingChapter(false);
+                    }}
+                    disabled={!newChapterTitle.trim() || addingChapter}
+                    style={{ flex: 1, padding: "7px 0", background: newChapterTitle.trim() ? "linear-gradient(135deg,#7c3aed,#a855f7)" : "rgba(124,58,237,0.3)", border: "none", borderRadius: 7, color: "#fff", fontSize: 12, fontWeight: 700, cursor: newChapterTitle.trim() ? "pointer" : "default", opacity: newChapterTitle.trim() ? 1 : 0.5 }}
+                  >
+                    {addingChapter ? "…" : "Créer le chapitre"}
+                  </button>
+                  <button
+                    onClick={() => { setShowAddChapter(false); setNewChapterTitle(""); setNewChapterVideoUrl(""); }}
+                    style={{ padding: "7px 10px", background: "none", border: "1px solid rgba(168,85,247,0.2)", borderRadius: 7, color: "#9a7dbd", fontSize: 12, cursor: "pointer" }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="player-chapters-list">
               {chapters.map((c, idx) => (
-                <button
-                  key={c.id}
-                  className={[
-                    "player-chapter-item",
-                    c.id === selectedId ? "active" : "",
-                    completed.has(c.id) ? "done" : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                  onClick={() => setSelectedId(c.id)}
-                >
-                  <span className="chapter-num">{idx + 1}</span>
-                  <span className="chapter-title">{c.title}</span>
-                  {completed.has(c.id) && (
-                    <span className="chapter-check">✓</span>
+                <div key={c.id} style={{ position: "relative", display: "flex", alignItems: "center", marginBottom: 2 }}>
+                  <button
+                    className={[
+                      "player-chapter-item",
+                      c.id === selectedId ? "active" : "",
+                      completed.has(c.id) ? "done" : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    onClick={() => setSelectedId(c.id)}
+                    style={{ flex: 1, paddingRight: isAdmin ? 36 : undefined }}
+                  >
+                    <span className="chapter-num">{idx + 1}</span>
+                    <span className="chapter-title">{c.title}</span>
+                    {completed.has(c.id) && <span className="chapter-check">✓</span>}
+                  </button>
+
+                  {isAdmin && (
+                    <button
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        if (!confirm(`Supprimer "${c.title}" ?`)) return;
+                        const { error } = await supabase.from("chapters").delete().eq("id", c.id);
+                        if (!error) {
+                          await reloadChapters();
+                          if (selectedId === c.id) {
+                            const remaining = chapters.filter((ch) => ch.id !== c.id);
+                            setSelectedId(remaining[0]?.id ?? null);
+                          }
+                        }
+                      }}
+                      title="Supprimer ce chapitre"
+                      style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", width: 24, height: 24, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 6, color: "#f87171", fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, zIndex: 2 }}
+                    >
+                      ✕
+                    </button>
                   )}
-                </button>
+                </div>
               ))}
             </div>
             <div className="player-sidebar-progress">
