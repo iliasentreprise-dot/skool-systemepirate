@@ -69,12 +69,14 @@ function PlayerPage() {
       }
       setChapter(ch as Chapter);
 
-      const [{ data: mod }, { data: chapList }] = await Promise.all([
+      const [{ data: mod }, { data: chapList }, { data: roleData }] = await Promise.all([
         supabase.from("modules").select("id, title, section").eq("id", ch.module_id).maybeSingle(),
         supabase.from("chapters").select("*").eq("module_id", ch.module_id).order("position"),
+        supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle(),
       ]);
 
       setModule(mod as Module);
+      setIsAdmin(!!roleData);
       const chapters = (chapList as Chapter[]) || [];
       setAllChapters(chapters);
 
