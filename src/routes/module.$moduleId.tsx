@@ -264,6 +264,11 @@ function ModulePage() {
                       title={selected?.title}
                     />
                   )
+                ) : !isAdmin ? (
+                  <div className="player-no-video fake-video-loading">
+                    <div className="fake-loader-spinner" />
+                    <div className="fake-loader-text">Chargement de la vidéo sur Supabase…</div>
+                  </div>
                 ) : (
                   <div className="player-no-video">
                     <span>📹</span>
