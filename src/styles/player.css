@@ -480,3 +480,42 @@
   .player-main { padding: 16px; }
   .player-title { font-size: 18px; }
 }
+
+/* ── Fake infinite loaders (students / moderators) ── */
+.fake-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 50vh;
+  padding: 40px 24px;
+}
+.fake-loader-spinner {
+  width: 56px;
+  height: 56px;
+  border: 4px solid rgba(168, 85, 247, 0.15);
+  border-top-color: #a855f7;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+.fake-loader-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: #c4a3f0;
+}
+.fake-loader-sub {
+  font-size: 12px;
+  color: #7c5c9a;
+}
+.player-no-video.fake-video-loading {
+  gap: 18px;
+}
+.player-no-video.fake-video-loading .fake-loader-spinner {
+  width: 52px;
+  height: 52px;
+}
+.player-no-video.fake-video-loading .fake-loader-text {
+  font-size: 14px;
+  color: #c4a3f0;
+}
