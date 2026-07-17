@@ -43,6 +43,7 @@ function PlayerPage() {
   const [module, setModule] = useState<Module | null>(null);
   const [allChapters, setAllChapters] = useState<Chapter[]>([]);
   const [completed, setCompleted] = useState<Set<string>>(new Set());
+  const [isAdmin, setIsAdmin] = useState(false);
   const [validating, setValidating] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [dataLoading, setDataLoading] = useState(true);
