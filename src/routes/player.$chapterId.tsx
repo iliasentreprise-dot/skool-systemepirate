@@ -43,6 +43,7 @@ function PlayerPage() {
   const [module, setModule] = useState<Module | null>(null);
   const [allChapters, setAllChapters] = useState<Chapter[]>([]);
   const [completed, setCompleted] = useState<Set<string>>(new Set());
+  const [isAdmin, setIsAdmin] = useState(false);
   const [validating, setValidating] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [dataLoading, setDataLoading] = useState(true);
@@ -68,12 +69,14 @@ function PlayerPage() {
       }
       setChapter(ch as Chapter);
 
-      const [{ data: mod }, { data: chapList }] = await Promise.all([
+      const [{ data: mod }, { data: chapList }, { data: roleData }] = await Promise.all([
         supabase.from("modules").select("id, title, section").eq("id", ch.module_id).maybeSingle(),
         supabase.from("chapters").select("*").eq("module_id", ch.module_id).order("position"),
+        supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle(),
       ]);
 
       setModule(mod as Module);
+      setIsAdmin(!!roleData);
       const chapters = (chapList as Chapter[]) || [];
       setAllChapters(chapters);
 
@@ -158,6 +161,11 @@ function PlayerPage() {
                 className="player-iframe"
                 title={chapter?.title}
               />
+            ) : !isAdmin ? (
+              <div className="player-no-video fake-video-loading">
+                <div className="fake-loader-spinner" />
+                <div className="fake-loader-text">Chargement de la vidéo sur Supabase…</div>
+              </div>
             ) : (
               <div className="player-no-video">
                 <span>📹</span>
