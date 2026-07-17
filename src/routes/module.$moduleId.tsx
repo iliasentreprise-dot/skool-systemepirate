@@ -311,8 +311,17 @@ function ModulePage() {
                 </div>
               </div>
             </>
+          ) : !isAdmin ? (
+            /* ── Élève / modérateur : chargement infini ── */
+            <div className="module-soon">
+              <div className="fake-loader">
+                <div className="fake-loader-spinner" />
+                <div className="fake-loader-text">Chargement du module…</div>
+                <div className="fake-loader-sub">Connexion à Supabase</div>
+              </div>
+            </div>
           ) : (
-            /* ── "Bientôt disponible" ── */
+            /* ── Admin : "Bientôt disponible" avec upload ── */
             <div className="module-soon">
               <div className="module-soon-illustration" aria-hidden="true">
                 <div className="ms-ring ms-ring-1" />
